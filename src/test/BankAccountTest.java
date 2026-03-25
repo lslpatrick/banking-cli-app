@@ -26,7 +26,7 @@ public class BankAccountTest {
             testAccount.deposit(-50);
             fail();
         } catch (IllegalArgumentException e) {
-            //do nothing, test passes
+            // do nothing, test passes
         }
     }
 
@@ -45,7 +45,7 @@ public class BankAccountTest {
             testAccount.withdraw(30);
             fail();
         } catch (IllegalArgumentException e) {
-            //do nothing, test passes
+            // do nothing, test passes
         }
     }
 
@@ -57,7 +57,7 @@ public class BankAccountTest {
             testAccount.withdraw(30);
             fail();
         } catch (IllegalArgumentException e) {
-            //do nothing, test passes
+            // do nothing, test passes
         }
     }
 
@@ -78,7 +78,6 @@ public class BankAccountTest {
     public void testTransactionHistoryAfterDeposit() {
         BankAccount account = new BankAccount();
         account.deposit(100);
-
         assertEquals(1, account.getTransactionHistory().size());
         assertEquals("Deposited: $100.0", account.getTransactionHistory().get(0));
     }
@@ -88,7 +87,6 @@ public class BankAccountTest {
         BankAccount account = new BankAccount();
         account.deposit(100);
         account.withdraw(40);
-
         assertEquals(2, account.getTransactionHistory().size());
         assertEquals("Withdrew: $40.0", account.getTransactionHistory().get(1));
     }
@@ -137,55 +135,72 @@ public class BankAccountTest {
     }
 
     @Test
-    public void testCannotCloseOnlyRemainingAccount(){
+    public void testCannotCloseOnlyRemainingAccount() {
         MainMenu menu = new MainMenu();
-
         menu.closeCurrentAccount();
-
-        List<BankAccount> accounts = getAccounts(menu);
+        List<BankAccount> accounts = menu.getAccounts();
         assertEquals(1, accounts.size());
         assertEquals("Default", menu.getCurrentAccount().getAccountName());
     }
 
     @Test
-    public void testCloseCurrentAccount(){
+    public void testCloseAccountSuccessful() {
         MainMenu menu = new MainMenu();
-        List<BankAccount> accounts = getAccounts(menu);
-
-        accounts.add(new BankAccount("nailong"));
-        setCurrentAccountIndex(menu, 1);
+        menu.getAccounts().add(new BankAccount("nailong"));
+        menu.setCurrentAccountIndex(1);
 
         menu.closeCurrentAccount();
 
-        assertEquals(1, accounts.size());
+        assertEquals(1, menu.getAccounts().size());
         assertEquals("Default", menu.getCurrentAccount().getAccountName());
     }
 
     @Test
-    public void testTransferBetweenAccounts(){
+    public void testCannotCloseAccountWithRemainingBalance() {
         MainMenu menu = new MainMenu();
-        List<BankAccount> accounts = getAccounts(menu);
+        menu.getAccounts().add(new BankAccount("nailong"));
+        menu.setCurrentAccountIndex(1);
+        menu.getCurrentAccount().deposit(50);
 
-        accounts.add(new BankAccount("nailong"));
+        menu.closeCurrentAccount();
+
+        assertEquals(2, menu.getAccounts().size());
+        assertEquals("nailong", menu.getCurrentAccount().getAccountName());
+    }
+
+    @Test
+    public void testTransferBetweenAccounts() {
+        MainMenu menu = new MainMenu();
+        menu.getAccounts().add(new BankAccount("nailong"));
         menu.getCurrentAccount().deposit(100);
-
         menu.transferBetweenAccounts(1, 40);
-
         assertEquals(60, menu.getCurrentAccount().getBalance(), 0.01);
-        assertEquals(40, accounts.get(1).getBalance(), 0.01);
+        assertEquals(40, menu.getAccounts().get(1).getBalance(), 0.01);
     }
 
     @Test
-    public void testCannotTransferToSameAccount(){
+    public void testCannotTransferToSameAccount() {
         MainMenu menu = new MainMenu();
         menu.getCurrentAccount().deposit(100);
 
         try {
             menu.transferBetweenAccounts(0, 40);
             fail();
-        } catch (IllegalArgumentException e) {}
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
     }
 
+    @Test
+    public void testTransferBetweenAccountsInvalidTarget() {
+        MainMenu menu = new MainMenu();
+        menu.getCurrentAccount().deposit(100);
 
-
+        try {
+            menu.transferBetweenAccounts(5, 40);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Test passes
+        }
+    }
 }

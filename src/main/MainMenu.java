@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Scanner;
 
 public class MainMenu {
-
-    private static final int EXIT_SELECTION = 10;
-	private static final int MAX_SELECTION = 10086;
+    private static final int EXIT_SELECTION = 9;
+    private static final int MAX_SELECTION = 10086;
 
     private Scanner keyboardInput;
     private List<BankAccount> accounts;
     private int currentAccountIndex;
-
 
     public MainMenu() {
         this.keyboardInput = new Scanner(System.in);
@@ -21,12 +19,19 @@ public class MainMenu {
         this.accounts.add(new BankAccount("Default"));
     }
 
+    public List<BankAccount> getAccounts() {
+        return accounts;
+    }
+
+    public void setCurrentAccountIndex(int index) {
+        this.currentAccountIndex = index;
+    }
+
     public void displayOptions() {
         System.out.println();
         System.out.println("Welcome to the 237 Bank App!");
         System.out.println("Current account: " + getCurrentAccount().getAccountName());
         System.out.println();
-        
         System.out.println("1. Make a deposit");
         System.out.println("2. Make a withdraw");
         System.out.println("3. Check balance");
@@ -35,13 +40,12 @@ public class MainMenu {
         System.out.println("6. Change current account");
         System.out.println("7. Close current account");
         System.out.println("8. Transfer money to another account");
-        System.out.println("10. Exit the app");
-
+        System.out.println("9. Exit the app");
     }
 
     public int getUserSelection(int max) {
         int selection = -1;
-        while(selection < 1 || selection > max) {
+        while (selection < 1 || selection > max) {
             System.out.print("Please make a selection: ");
             selection = keyboardInput.nextInt();
         }
@@ -77,13 +81,13 @@ public class MainMenu {
         }
     }
 
-    public BankAccount getCurrentAccount() { 
+    public BankAccount getCurrentAccount() {
         return accounts.get(currentAccountIndex);
     }
 
     public void performDeposit() {
         double depositAmount = -1;
-        while(depositAmount < 0) {
+        while (depositAmount < 0) {
             System.out.print("How much would you like to deposit: ");
             depositAmount = keyboardInput.nextInt();
         }
@@ -92,7 +96,7 @@ public class MainMenu {
 
     public void performWithdraw() {
         double withdrawAmount = -1;
-        while(withdrawAmount < 0) {
+        while (withdrawAmount < 0) {
             System.out.print("How much would you like to withdraw: ");
             withdrawAmount = keyboardInput.nextInt();
         }
@@ -107,7 +111,7 @@ public class MainMenu {
 
     public void viewTransactionHistory() {
         if (getCurrentAccount().getTransactionHistory().isEmpty()) {
-            System.out.println("No transactions record found.");
+            System.out.println("No transactions history found.");
         } else {
             System.out.println("Transaction History:");
             for (String transaction : getCurrentAccount().getTransactionHistory()) {
@@ -123,7 +127,6 @@ public class MainMenu {
     public void createAccount() {
         System.out.print("Enter account name: ");
         String accountName = keyboardInput.next();
-
         accounts.add(new BankAccount(accountName));
         System.out.println("New account created.");
     }
@@ -147,12 +150,12 @@ public class MainMenu {
 
     public void closeCurrentAccount() {
         if (accounts.size() == 1) {
-            System.out.println("You cannot close your only remaining account.");
+            System.out.println("Unable to close the only remaining account.");
             return;
         }
 
         if (getCurrentAccount().getBalance() != 0) {
-            System.out.println("You cannot close an account with a remaining balance.");
+            System.out.println("Unable to close an account with a remaining balance.");
             return;
         }
 
@@ -215,7 +218,7 @@ public class MainMenu {
 
     public void run() {
         int selection = -1;
-        while(selection != EXIT_SELECTION) {
+        while (selection != EXIT_SELECTION) {
             displayOptions();
             selection = getUserSelection(MAX_SELECTION);
             processInput(selection);
