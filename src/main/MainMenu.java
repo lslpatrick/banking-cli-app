@@ -34,6 +34,7 @@ public class MainMenu {
         System.out.println("5. Create additional account");
         System.out.println("6. Change current account");
         System.out.println("7. Close current account");
+        System.out.println("8. Transfer money to another account");
         System.out.println("10. Exit the app");
 
     }
@@ -69,6 +70,9 @@ public class MainMenu {
                 break;
             case 7:
                 closeCurrentAccount();
+                break;
+            case 8:
+                transferMoney();
                 break;
         }
     }
@@ -161,6 +165,52 @@ public class MainMenu {
 
         System.out.println("Account closed: " + closedAccountName);
         System.out.println("Current account: " + getCurrentAccount().getAccountName());
+    }
+
+    public void transferMoney() {
+        if (accounts.size() == 1) {
+            System.out.println("You need at least two accounts to make a transfer.");
+            return;
+        }
+
+        double transferAmount = -1;
+        while (transferAmount <= 0) {
+            System.out.print("How much would you like to transfer: ");
+            transferAmount = keyboardInput.nextDouble();
+        }
+
+        System.out.println("Available accounts:");
+        for (int i = 0; i < accounts.size(); i++) {
+            System.out.println((i + 1) + ". " + accounts.get(i).getAccountName());
+        }
+
+        System.out.print("Enter target account number: ");
+        int targetAccountNumber = keyboardInput.nextInt();
+
+        try {
+            transferBetweenAccounts(targetAccountNumber - 1, transferAmount);
+            System.out.println("Transfer successful.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Transfer failed.");
+        }
+    }
+
+    public void transferBetweenAccounts(int targetAccountIndex, double amount) {
+        if (targetAccountIndex < 0 || targetAccountIndex >= accounts.size()) {
+            throw new IllegalArgumentException();
+        }
+
+        if (targetAccountIndex == currentAccountIndex) {
+            throw new IllegalArgumentException();
+        }
+
+        if (amount <= 0) {
+            throw new IllegalArgumentException();
+        }
+
+        BankAccount targetAccount = accounts.get(targetAccountIndex);
+        getCurrentAccount().withdraw(amount);
+        targetAccount.deposit(amount);
     }
 
     public void run() {
