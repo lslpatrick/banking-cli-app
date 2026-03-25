@@ -33,6 +33,7 @@ public class MainMenu {
         System.out.println("4. View transaction history");
         System.out.println("5. Create additional account");
         System.out.println("6. Change current account");
+        System.out.println("7. Close current account");
         System.out.println("10. Exit the app");
 
     }
@@ -65,6 +66,9 @@ public class MainMenu {
                 break;
             case 6:
                 changeCurrentAccount();
+                break;
+            case 7:
+                closeCurrentAccount();
                 break;
         }
     }
@@ -135,6 +139,28 @@ public class MainMenu {
         } else {
             System.out.println("Invalid account number.");
         }
+    }
+
+    public void closeCurrentAccount() {
+        if (accounts.size() == 1) {
+            System.out.println("You cannot close your only remaining account.");
+            return;
+        }
+
+        if (getCurrentAccount().getBalance() != 0) {
+            System.out.println("You cannot close an account with a remaining balance.");
+            return;
+        }
+
+        String closedAccountName = getCurrentAccount().getAccountName();
+        accounts.remove(currentAccountIndex);
+
+        if (currentAccountIndex >= accounts.size()) {
+            currentAccountIndex = 0;
+        }
+
+        System.out.println("Account closed: " + closedAccountName);
+        System.out.println("Current account: " + getCurrentAccount().getAccountName());
     }
 
     public void run() {
