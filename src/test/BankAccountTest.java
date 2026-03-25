@@ -1,9 +1,12 @@
 package test;
 
 import main.BankAccount;
+import main.MainMenu;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -131,6 +134,31 @@ public class BankAccountTest {
 
         assertEquals(100, acc1.getBalance(), 0.01);
         assertEquals(50, acc2.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testCannotCloseOnlyRemainingAccount(){
+        MainMenu menu = new MainMenu();
+
+        menu.closeCurrentAccount();
+
+        List<BankAccount> accounts = getAccounts(menu);
+        assertEquals(1, accounts.size());
+        assertEquals("Default", menu.getCurrentAccount().getAccountName());
+    }
+
+    @Test
+    public void testCloseCurrentAccount(){
+        MainMenu menu = new MainMenu();
+        List<BankAccount> accounts = getAccounts(menu);
+
+        accounts.add(new BankAccount("nailong"));
+        setCurrentAccountIndex(menu, 1);
+
+        menu.closeCurrentAccount();
+
+        assertEquals(1, accounts.size());
+        assertEquals("Default", menu.getCurrentAccount().getAccountName());
     }
 
 
