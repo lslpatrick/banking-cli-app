@@ -27,5 +27,5 @@
 No
 
 ## What commands are needed to compile and run your code from the command line (you should provide a script that people can use to run your program)
-chmod +x runApp.sh 
+chmod +x runApp.sh  
 ./runApp.sh
