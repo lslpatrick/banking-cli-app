@@ -6,11 +6,24 @@ public class BankAccount {
 
     private double balance;
     private List<String> transactionHistory;
+    private String accountName;
+
 
 
     public BankAccount() {
+        this.accountName = "Default";
         this.balance = 0;
         this.transactionHistory = new java.util.ArrayList<>();
+    }
+
+    public BankAccount(String accountName) {
+        this.accountName = accountName;
+        this.balance = 0;
+        this.transactionHistory = new java.util.ArrayList<>();
+    }
+
+    public String getAccountName() {
+        return this.accountName;
     }
 
     public void deposit(double amount) {
