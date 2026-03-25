@@ -89,4 +89,49 @@ public class BankAccountTest {
         assertEquals(2, account.getTransactionHistory().size());
         assertEquals("Withdrew: $40.0", account.getTransactionHistory().get(1));
     }
+
+    @Test
+    public void testDefaultAccountName() {
+        BankAccount testAccount = new BankAccount();
+        assertEquals("Default", testAccount.getAccountName());
+    }
+
+    @Test
+    public void testCustomAccountName() {
+        BankAccount testAccount = new BankAccount("nailong");
+        assertEquals("nailong", testAccount.getAccountName());
+    }
+
+    @Test
+    public void testNewAccountBalanceIsZero() {
+        BankAccount testAccount = new BankAccount("nailong");
+        assertEquals(0, testAccount.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testNewAccountTransactionHistoryIsEmpty() {
+        BankAccount testAccount = new BankAccount("nailong");
+        assertEquals(0, testAccount.getTransactionHistory().size());
+    }
+
+    @Test
+    public void testDepositWithCustomAccount() {
+        BankAccount testAccount = new BankAccount("nailong");
+        testAccount.deposit(200);
+        assertEquals(200, testAccount.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testMultipleAccountsIndependence() {
+        BankAccount acc1 = new BankAccount("nailong");
+        BankAccount acc2 = new BankAccount("nailong2");
+
+        acc1.deposit(100);
+        acc2.deposit(50);
+
+        assertEquals(100, acc1.getBalance(), 0.01);
+        assertEquals(50, acc2.getBalance(), 0.01);
+    }
+
+
 }
