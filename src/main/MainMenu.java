@@ -4,8 +4,8 @@ import java.util.Scanner;
 
 public class MainMenu {
 
-    private static final int EXIT_SELECTION = 4;
-	private static final int MAX_SELECTION = 4;
+    private static final int EXIT_SELECTION = 10;
+	private static final int MAX_SELECTION = 10;
 
 	private BankAccount userAccount;
     private Scanner keyboardInput;
@@ -16,12 +16,14 @@ public class MainMenu {
     }
 
     public void displayOptions() {
+        System.out.println();
         System.out.println("Welcome to the 237 Bank App!");
         
         System.out.println("1. Make a deposit");
         System.out.println("2. Make a withdraw");
         System.out.println("3. Check balance");
-        System.out.println("4. Exit the app");
+        System.out.println("4. View transaction history");
+        System.out.println("10. Exit the app");
 
     }
 
@@ -44,6 +46,9 @@ public class MainMenu {
                 break;
             case 3:
                 checkBalance();
+                break;
+            case 4:
+                viewTransactionHistory();
                 break;
         }
     }
@@ -69,6 +74,17 @@ public class MainMenu {
             System.out.println("Current balance: " + userAccount.getBalance());
         } catch (IllegalArgumentException e) {
             System.out.println("Withdrawal failed: insufficient funds or invalid amount.");
+        }
+    }
+
+    public void viewTransactionHistory() {
+        if (userAccount.getTransactionHistory().isEmpty()) {
+            System.out.println("No transactions record found.");
+        } else {
+            System.out.println("Transaction History:");
+            for (String transaction : userAccount.getTransactionHistory()) {
+                System.out.println(transaction);
+            }
         }
     }
 

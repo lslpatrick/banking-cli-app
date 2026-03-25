@@ -36,7 +36,7 @@ public class BankAccountTest {
     }
 
     @Test
-    public void testInvalidWithdraw1() {
+    public void testWithdrawWhenNoMoney() {
         BankAccount testAccount = new BankAccount();
         try {
             testAccount.withdraw(30);
@@ -47,7 +47,7 @@ public class BankAccountTest {
     }
 
     @Test
-    public void testInvalidWithdraw2() {
+    public void testOverWithdraw() {
         BankAccount testAccount = new BankAccount();
         try {
             testAccount.deposit(20);
@@ -69,5 +69,24 @@ public class BankAccountTest {
         BankAccount testAccount = new BankAccount();
         testAccount.deposit(50);
         assertEquals(50, testAccount.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testTransactionHistoryAfterDeposit() {
+        BankAccount account = new BankAccount();
+        account.deposit(100);
+
+        assertEquals(1, account.getTransactionHistory().size());
+        assertEquals("Deposited: $100.0", account.getTransactionHistory().get(0));
+    }
+
+    @Test
+    public void testTransactionHistoryAfterWithdraw() {
+        BankAccount account = new BankAccount();
+        account.deposit(100);
+        account.withdraw(40);
+
+        assertEquals(2, account.getTransactionHistory().size());
+        assertEquals("Withdrew: $40.0", account.getTransactionHistory().get(1));
     }
 }
