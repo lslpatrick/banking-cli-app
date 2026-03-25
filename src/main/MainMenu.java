@@ -4,8 +4,8 @@ import java.util.Scanner;
 
 public class MainMenu {
 
-    private static final int EXIT_SELECTION = 3;
-	private static final int MAX_SELECTION = 3;
+    private static final int EXIT_SELECTION = 4;
+	private static final int MAX_SELECTION = 4;
 
 	private BankAccount userAccount;
     private Scanner keyboardInput;
@@ -20,7 +20,8 @@ public class MainMenu {
         
         System.out.println("1. Make a deposit");
         System.out.println("2. Make a withdraw");
-        System.out.println("3. Exit the app");
+        System.out.println("3. Check balance");
+        System.out.println("4. Exit the app");
 
     }
 
@@ -40,6 +41,9 @@ public class MainMenu {
                 break;
             case 2:
                 performWithdraw();
+                break;
+            case 3:
+                checkBalance();
                 break;
         }
     }
@@ -66,6 +70,10 @@ public class MainMenu {
         } catch (IllegalArgumentException e) {
             System.out.println("Withdrawal failed: insufficient funds or invalid amount.");
         }
+    }
+
+    public void checkBalance() {
+        System.out.println("Current balance: " + userAccount.getBalance());
     }
 
     public void run() {
