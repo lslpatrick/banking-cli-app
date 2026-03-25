@@ -161,5 +161,31 @@ public class BankAccountTest {
         assertEquals("Default", menu.getCurrentAccount().getAccountName());
     }
 
+    @Test
+    public void testTransferBetweenAccounts(){
+        MainMenu menu = new MainMenu();
+        List<BankAccount> accounts = getAccounts(menu);
+
+        accounts.add(new BankAccount("nailong"));
+        menu.getCurrentAccount().deposit(100);
+
+        menu.transferBetweenAccounts(1, 40);
+
+        assertEquals(60, menu.getCurrentAccount().getBalance(), 0.01);
+        assertEquals(40, accounts.get(1).getBalance(), 0.01);
+    }
+
+    @Test
+    public void testCannotTransferToSameAccount(){
+        MainMenu menu = new MainMenu();
+        menu.getCurrentAccount().deposit(100);
+
+        try {
+            menu.transferBetweenAccounts(0, 40);
+            fail();
+        } catch (IllegalArgumentException e) {}
+    }
+
+
 
 }
