@@ -8,12 +8,14 @@ public class BankAccount {
     private double balance;
     private List<String> transactionHistory;
     
+    // Constructors
     public BankAccount() {
         this.accountName = "Default";
         this.balance = 0;
         this.transactionHistory = new ArrayList<>();
     }
 
+    // Constructor with account name
     public BankAccount(String accountName) {
         this.accountName = accountName;
         this.balance = 0;

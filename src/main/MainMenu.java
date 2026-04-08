@@ -9,28 +9,17 @@ public class MainMenu {
     private static final int MAX_SELECTION = 10086;
 
     private Scanner keyboardInput;
-    private List<BankAccount> accounts;
-    private int currentAccountIndex;
+    private Bank bank;
 
     public MainMenu() {
         this.keyboardInput = new Scanner(System.in);
-        this.accounts = new ArrayList<>();
-        this.currentAccountIndex = 0;
-        this.accounts.add(new BankAccount("Default"));
-    }
-
-    public List<BankAccount> getAccounts() {
-        return accounts;
-    }
-
-    public void setCurrentAccountIndex(int index) {
-        this.currentAccountIndex = index;
+        this.bank = new Bank();
     }
 
     public void displayOptions() {
         System.out.println();
         System.out.println("Welcome to the 237 Bank App!");
-        System.out.println("Current account: " + getCurrentAccount().getAccountName());
+        System.out.println("Current account: " + bank.getCurrentAccount().getAccountName());
         System.out.println();
         System.out.println("1. Make a deposit");
         System.out.println("2. Make a withdraw");
@@ -78,11 +67,9 @@ public class MainMenu {
             case 8:
                 transferMoney();
                 break;
+            default:
+                break;
         }
-    }
-
-    public BankAccount getCurrentAccount() {
-        return accounts.get(currentAccountIndex);
     }
 
     public void performDeposit() {
@@ -91,7 +78,7 @@ public class MainMenu {
             System.out.print("How much would you like to deposit: ");
             depositAmount = keyboardInput.nextInt();
         }
-        getCurrentAccount().deposit(depositAmount);
+        bank.getCurrentAccount().deposit(depositAmount);
     }
 
     public void performWithdraw() {
@@ -101,37 +88,38 @@ public class MainMenu {
             withdrawAmount = keyboardInput.nextInt();
         }
         try {
-            getCurrentAccount().withdraw(withdrawAmount);
+            bank.getCurrentAccount().withdraw(withdrawAmount);
             System.out.println("Withdrawal successful.");
-            System.out.println("Current balance: " + getCurrentAccount().getBalance());
+            System.out.println("Current balance: " + bank.getCurrentAccount().getBalance());
         } catch (IllegalArgumentException e) {
             System.out.println("Withdrawal failed: insufficient funds or invalid amount.");
         }
     }
 
     public void viewTransactionHistory() {
-        if (getCurrentAccount().getTransactionHistory().isEmpty()) {
+        if (bank.getCurrentAccount().getTransactionHistory().isEmpty()) {
             System.out.println("No transactions history found.");
         } else {
             System.out.println("Transaction History:");
-            for (String transaction : getCurrentAccount().getTransactionHistory()) {
+            for (String transaction : bank.getCurrentAccount().getTransactionHistory()) {
                 System.out.println(transaction);
             }
         }
     }
 
     public void checkBalance() {
-        System.out.println("Current balance: " + getCurrentAccount().getBalance());
+        System.out.println("Current balance: " + bank.getCurrentAccount().getBalance());
     }
 
     public void createAccount() {
         System.out.print("Enter account name: ");
         String accountName = keyboardInput.next();
-        accounts.add(new BankAccount(accountName));
+        bank.createAccount(accountName);
         System.out.println("New account created.");
     }
 
     public void changeCurrentAccount() {
+        List<BankAccount> accounts = bank.getAccounts();
         System.out.println("Available accounts:");
         for (int i = 0; i < accounts.size(); i++) {
             System.out.println((i + 1) + ". " + accounts.get(i).getAccountName());
@@ -140,37 +128,27 @@ public class MainMenu {
         System.out.print("Enter account number: ");
         int newAccountNumber = keyboardInput.nextInt();
 
-        if (newAccountNumber >= 1 && newAccountNumber <= accounts.size()) {
-            currentAccountIndex = newAccountNumber - 1;
-            System.out.println("Switched to account: " + getCurrentAccount().getAccountName());
-        } else {
+        try {
+            bank.changeCurrentAccount(newAccountNumber - 1);
+            System.out.println("Switched to account: " + bank.getCurrentAccount().getAccountName());
+        } catch (IllegalArgumentException e) {
             System.out.println("Invalid account number.");
         }
     }
 
     public void closeCurrentAccount() {
-        if (accounts.size() == 1) {
-            System.out.println("Unable to close the only remaining account.");
-            return;
+        try {
+            String closedAccountName = bank.closeCurrentAccount();
+            System.out.println("Account closed: " + closedAccountName);
+            System.out.println("Current account: " + bank.getCurrentAccount().getAccountName());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
-
-        if (getCurrentAccount().getBalance() != 0) {
-            System.out.println("Unable to close an account with a remaining balance.");
-            return;
-        }
-
-        String closedAccountName = getCurrentAccount().getAccountName();
-        accounts.remove(currentAccountIndex);
-
-        if (currentAccountIndex >= accounts.size()) {
-            currentAccountIndex = 0;
-        }
-
-        System.out.println("Account closed: " + closedAccountName);
-        System.out.println("Current account: " + getCurrentAccount().getAccountName());
     }
 
     public void transferMoney() {
+        List<BankAccount> accounts = bank.getAccounts();
+
         if (accounts.size() == 1) {
             System.out.println("You need at least two accounts to make a transfer.");
             return;
@@ -191,30 +169,13 @@ public class MainMenu {
         int targetAccountNumber = keyboardInput.nextInt();
 
         try {
-            transferBetweenAccounts(targetAccountNumber - 1, transferAmount);
+            bank.transferBetweenAccounts(targetAccountNumber - 1, transferAmount);
             System.out.println("Transfer successful.");
         } catch (IllegalArgumentException e) {
-            System.out.println("Transfer failed.");
+            System.out.println("Transfer failed: " + e.getMessage());
         }
     }
 
-    public void transferBetweenAccounts(int targetAccountIndex, double amount) {
-        if (targetAccountIndex < 0 || targetAccountIndex >= accounts.size()) {
-            throw new IllegalArgumentException();
-        }
-
-        if (targetAccountIndex == currentAccountIndex) {
-            throw new IllegalArgumentException();
-        }
-
-        if (amount <= 0) {
-            throw new IllegalArgumentException();
-        }
-
-        BankAccount targetAccount = accounts.get(targetAccountIndex);
-        getCurrentAccount().withdraw(amount);
-        targetAccount.deposit(amount);
-    }
 
     public void run() {
         int selection = -1;
@@ -229,5 +190,4 @@ public class MainMenu {
         MainMenu bankApp = new MainMenu();
         bankApp.run();
     }
-
 }
