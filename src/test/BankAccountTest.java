@@ -203,4 +203,16 @@ public class BankAccountTest {
             // Test passes
         }
     }
+
+    @Test
+    public void testCollectFeeFromExistingAccount() {
+        MainMenu menu = new MainMenu();
+        menu.getCurrentAccount().deposit(100);
+
+        menu.collectFeeFromAccount(0, 10);
+
+        assertEquals(90, menu.getCurrentAccount().getBalance(), 0.01);
+        assertEquals(2, menu.getCurrentAccount().getTransactionHistory().size());
+        assertEquals("Collected fee: $10.0", menu.getCurrentAccount().getTransactionHistory().get(1));
+    }
 }

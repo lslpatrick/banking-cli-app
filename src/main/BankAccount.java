@@ -50,5 +50,14 @@ public class BankAccount {
         } else {
             throw new IllegalArgumentException();
         }
-    }   
+    }
+
+    public void collectFee(double feeAmount) {
+        if (feeAmount <= 0 || feeAmount > this.balance) {
+            throw new IllegalArgumentException();
+        }
+
+        this.balance -= feeAmount;
+        this.transactionHistory.add("Collected fee: $" + feeAmount);
+    }
 }

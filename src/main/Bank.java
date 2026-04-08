@@ -77,4 +77,22 @@ public class Bank {
         getCurrentAccount().withdraw(amount);
         targetAccount.deposit(amount);
     }
+
+    public void collectFeeFromAccount(int accountIndex, double feeAmount) {
+        if (accountIndex < 0 || accountIndex >= accounts.size()) {
+            throw new IllegalArgumentException("Invalid account index.");
+        }
+
+        accounts.get(accountIndex).collectFee(feeAmount);
+    }
+
+    public void collectFeeFromAllAccounts(double feeAmount) {
+        if (feeAmount <= 0) {
+            throw new IllegalArgumentException("Fee amount must be greater than zero.");
+        }
+
+        for (BankAccount account : accounts) {
+            account.collectFee(feeAmount);
+        }
+    }
 }
