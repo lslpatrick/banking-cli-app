@@ -95,4 +95,12 @@ public class Bank {
             account.collectFee(feeAmount);
         }
     }
+
+    public void addInterestToAccount(int accountIndex, double interestAmount) {
+        if (accountIndex < 0 || accountIndex >= accounts.size()) {
+            throw new IllegalArgumentException("Invalid account index.");
+        }
+
+        accounts.get(accountIndex).addInterestPayment(interestAmount);
+    }
 }

@@ -60,4 +60,13 @@ public class BankAccount {
         this.balance -= feeAmount;
         this.transactionHistory.add("Collected fee: $" + feeAmount);
     }
+
+    public void addInterestPayment(double interestAmount) {
+        if (interestAmount <= 0) {
+            throw new IllegalArgumentException();
+        }
+
+        this.balance += interestAmount;
+        this.transactionHistory.add("Interest payment: $" + interestAmount);
+    }
 }
