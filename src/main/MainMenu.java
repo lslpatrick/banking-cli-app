@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class MainMenu {
-    private static final int EXIT_SELECTION = 12;
+    private static final int EXIT_SELECTION = 10;
     private static final int MAX_SELECTION = 10086;
 
     private Scanner keyboardInput;
@@ -21,7 +21,7 @@ public class MainMenu {
     public void displayOptions() {
         System.out.println();
         System.out.println("Welcome to the 237 Bank App!");
-        System.out.println("Current account: " + bank.getCurrentAccount().getAccountName());
+        System.out.println("Current account: " + bank.getCurrentAccount().getAccountName()+ " (" + bank.getCurrentAccount().getAccountType() + ")");
         System.out.println("Admin mode: " + (adminMode ? "ON" : "OFF"));
         System.out.println();
         System.out.println("1. Make a deposit");
@@ -33,12 +33,7 @@ public class MainMenu {
         System.out.println("7. Close current account");
         System.out.println("8. Transfer money to another account");
         System.out.println("9. Enter/Exit admin mode");
-        if (adminMode) {
-            System.out.println("10. Collect fee from an account");
-            System.out.println("11. Add interest payment to an account");
-        }
-
-        System.out.println("12. Exit the app");
+        System.out.println("10. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -80,20 +75,6 @@ public class MainMenu {
                 toggleAdminMode();
                 break;
             case 10:
-                if (adminMode) {
-                    collectFeeAdmin();
-                } else {
-                    System.out.println("Invalid selection.");
-                }
-                break;
-            case 11:
-                if (adminMode) {
-                    addInterestAdmin();
-                } else {
-                    System.out.println("Invalid selection.");
-                }
-                break;
-            case 12:
                 System.out.println("Goodbye!");
                 break;
             default:
@@ -106,21 +87,27 @@ public class MainMenu {
         double depositAmount = -1;
         while (depositAmount < 0) {
             System.out.print("How much would you like to deposit: ");
-            depositAmount = keyboardInput.nextInt();
+            depositAmount = keyboardInput.nextDouble();
         }
-        bank.getCurrentAccount().deposit(depositAmount);
+
+        try {
+            bank.getCurrentAccount().deposit(depositAmount);
+        } catch (IllegalStateException e) {
+            System.out.println("Account Frozen, Action Fail");
+        }
     }
 
     public void performWithdraw() {
         double withdrawAmount = -1;
         while (withdrawAmount < 0) {
             System.out.print("How much would you like to withdraw: ");
-            withdrawAmount = keyboardInput.nextInt();
+            withdrawAmount = keyboardInput.nextDouble();
         }
+
         try {
             bank.getCurrentAccount().withdraw(withdrawAmount);
-            System.out.println("Withdrawal successful.");
-            System.out.println("Current balance: " + bank.getCurrentAccount().getBalance());
+        } catch (IllegalStateException e) {
+            System.out.println("Account Frozen, Action Fail");
         } catch (IllegalArgumentException e) {
             System.out.println("Withdrawal failed: insufficient funds or invalid amount.");
         }
@@ -142,18 +129,33 @@ public class MainMenu {
     }
 
     public void createAccount() {
+        System.out.println("Select account type:");
+        System.out.println("1. Saving");
+        System.out.println("2. Checking");
+
+        int typeSelection = getUserSelection(2);
+        String accountType;
+
+        if (typeSelection == 1) {
+            accountType = "Saving";
+        } else {
+            accountType = "Checking";
+        }
+
         System.out.print("Enter account name: ");
         String accountName = keyboardInput.next();
-        bank.createAccount(accountName);
-        System.out.println("New account created.");
+
+        bank.createAccount(accountName, accountType);
+        System.out.println("New " + accountType + " account created.");
     }
 
     public void changeCurrentAccount() {
         List<BankAccount> accounts = bank.getAccounts();
         System.out.println("Available accounts:");
         for (int i = 0; i < accounts.size(); i++) {
-            System.out.println((i + 1) + ". " + accounts.get(i).getAccountName());
+            System.out.println((i + 1) + ". " + accounts.get(i).getAccountName() + " (" + accounts.get(i).getAccountType() + ")");
         }
+
 
         System.out.print("Enter account number: ");
         int newAccountNumber = keyboardInput.nextInt();
@@ -203,44 +205,122 @@ public class MainMenu {
     public void toggleAdminMode() {
         adminMode = !adminMode;
         System.out.println("Admin mode is now " + (adminMode ? "ON" : "OFF"));
-    }
 
-    public void collectFeeAdmin() {
-        List<BankAccount> accounts = bank.getAccounts();
-
-        System.out.println("Available accounts:");
-        for (int i = 0; i < accounts.size(); i++) {
-            System.out.println((i + 1) + ". " + accounts.get(i).getAccountName());
+        if (adminMode) {
+            adminMenu();
         }
-
-        System.out.print("Enter account number: ");
-        int accountNumber = keyboardInput.nextInt();
-
-        System.out.print("Enter fee amount: ");
-        double feeAmount = keyboardInput.nextDouble();
-
-        bank.collectFeeFromAccount(accountNumber - 1, feeAmount);
-        System.out.println("Fee collected successfully.");
     }
 
-    public void addInterestAdmin() {
-        List<BankAccount> accounts = bank.getAccounts();
+    public void adminMenu() {
+        while (adminMode) {
+            System.out.println();
+            System.out.println("=== Admin Menu ===");
+            System.out.println("1. View All Accounts");
+            System.out.println("2. Exit Admin Mode");
 
-        System.out.println("Available accounts:");
-        for (int i = 0; i < accounts.size(); i++) {
-            System.out.println((i + 1) + ". " + accounts.get(i).getAccountName());
+            int selection = getUserSelection(2);
+
+            switch (selection) {
+                case 1:
+                    viewAllAccountsAdmin();
+                    break;
+                case 2:
+                    adminMode = false;
+                    System.out.println("Admin mode is now OFF");
+                    break;
+                default:
+                    System.out.println("Invalid selection.");
+                    break;
+            }
         }
-
-        System.out.print("Enter account number: ");
-        int accountNumber = keyboardInput.nextInt();
-
-        System.out.print("Enter interest amount: ");
-        double interestAmount = keyboardInput.nextDouble();
-
-        bank.addInterestToAccount(accountNumber - 1, interestAmount);
-        System.out.println("Interest payment added successfully.");
     }
 
+    public void viewAllAccountsAdmin() {
+        while (true) {
+            List<BankAccount> accounts = bank.getAccounts();
+
+            System.out.println();
+            System.out.println("=== Account List ===");
+            System.out.println("Select an account to freeze, unfreeze, collect fee, or add interest.");
+
+            for (int i = 0; i < accounts.size(); i++) {
+                BankAccount account = accounts.get(i);
+                String status = account.isFrozen() ? "Frozen" : "Active";
+
+                System.out.println((i + 1) + ". " 
+                    + account.getAccountName()
+                    + " | Type: " + account.getAccountType()
+                    + " | Balance: $" + account.getBalance()
+                    + " | Status: " + status);
+            }
+
+            System.out.println((accounts.size() + 1) + ". Exit Account List");
+            System.out.print("Enter selection: ");
+
+            int selection = keyboardInput.nextInt();
+
+            if (selection == accounts.size() + 1) {
+                return;
+            }
+
+            if (selection < 1 || selection > accounts.size()) {
+                System.out.println("Invalid selection.");
+                continue;
+            }
+
+            adminAccountActionMenu(selection - 1);
+        }
+    }
+
+    public void adminAccountActionMenu(int accountIndex) {
+        BankAccount account = bank.getAccounts().get(accountIndex);
+
+        while (true) {
+            System.out.println();
+            System.out.println("=== Admin Action Menu ===");
+            System.out.println("Account: " + account.getAccountName());
+            System.out.println("Type: " + account.getAccountType());
+            System.out.println("Balance: $" + account.getBalance());
+            System.out.println("Status: " + (account.isFrozen() ? "Frozen" : "Active"));
+            System.out.println("1. Freeze Account");
+            System.out.println("2. Unfreeze Account");
+            System.out.println("3. Collect Fee");
+            System.out.println("4. Add Interest");
+            System.out.println("5. Back to Account List");
+
+            int selection = getUserSelection(5);
+
+            switch (selection) {
+                case 1:
+                    bank.freezeAccount(accountIndex);
+                    System.out.println("Account frozen successfully.");
+                    break;
+                case 2:
+                    bank.unfreezeAccount(accountIndex);
+                    System.out.println("Account unfrozen successfully.");
+                    break;
+                case 3:
+                    System.out.print("Enter fee amount: ");
+                    double feeAmount = keyboardInput.nextDouble();
+                    bank.collectFeeFromAccount(accountIndex, feeAmount);
+                    System.out.println("Fee collected successfully.");
+                    break;
+                case 4:
+                    System.out.print("Enter interest amount: ");
+                    double interestAmount = keyboardInput.nextDouble();
+                    bank.addInterestToAccount(accountIndex, interestAmount);
+                    System.out.println("Interest payment added successfully.");
+                    break;
+                case 5:
+                    return;
+                default:
+                    System.out.println("Invalid selection.");
+                    break;
+            }
+
+            account = bank.getAccounts().get(accountIndex);
+        }
+    }
 
     public void run() {
         int selection = -1;

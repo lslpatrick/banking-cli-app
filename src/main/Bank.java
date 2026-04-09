@@ -10,7 +10,7 @@ public class Bank {
     public Bank() {
         this.accounts = new ArrayList<>();
         this.currentAccountIndex = 0;
-        this.accounts.add(new BankAccount("Default"));
+        this.accounts.add(new BankAccount("Default", "Checking"));
     }
 
     public List<BankAccount> getAccounts() {
@@ -36,8 +36,8 @@ public class Bank {
         currentAccountIndex = newAccountIndex;
     }
 
-    public void createAccount(String accountName) {
-        accounts.add(new BankAccount(accountName));
+    public void createAccount(String accountName, String accountType) {
+        accounts.add(new BankAccount(accountName, accountType));
     }
 
     public String closeCurrentAccount() {
@@ -103,4 +103,19 @@ public class Bank {
 
         accounts.get(accountIndex).addInterestPayment(interestAmount);
     }
+
+    public void freezeAccount(int accountIndex) { //Admin
+        if (accountIndex < 0 || accountIndex >= accounts.size()) {
+            throw new IllegalArgumentException("Invalid account index.");
+        }
+        accounts.get(accountIndex).freezeAccount();
+    }
+
+    public void unfreezeAccount(int accountIndex) { //Admin
+        if (accountIndex < 0 || accountIndex >= accounts.size()) {
+            throw new IllegalArgumentException("Invalid account index.");
+        }
+        accounts.get(accountIndex).unfreezeAccount();
+    }
+
 }

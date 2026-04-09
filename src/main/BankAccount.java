@@ -5,25 +5,33 @@ import java.util.ArrayList;
 
 public class BankAccount {
     private String accountName;
+    private String accountType;
     private double balance;
     private List<String> transactionHistory;
+    private boolean frozen;
     
-    // Constructors
     public BankAccount() {
         this.accountName = "Default";
+        this.accountType = "Checking";
         this.balance = 0;
         this.transactionHistory = new ArrayList<>();
+        this.frozen = false;
     }
 
-    // Constructor with account name
-    public BankAccount(String accountName) {
+    public BankAccount(String accountName, String accountType) {
         this.accountName = accountName;
+        this.accountType = accountType;
         this.balance = 0;
         this.transactionHistory = new ArrayList<>();
+        this.frozen = false;
     }
 
     public String getAccountName() {
         return this.accountName;
+    }
+
+    public String getAccountType() {
+        return this.accountType;
     }
 
     public double getBalance() {
@@ -35,18 +43,26 @@ public class BankAccount {
     }
 
     public void deposit(double amount) {
+        if (this.frozen) {
+            throw new IllegalStateException("Account is frozen.");
+        }
+
         if (amount > 0) {
             this.balance += amount;
-            this.transactionHistory.add("Deposited: $" + amount); // Adds deposit to transaction history
+            this.transactionHistory.add("Deposited: $" + amount);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
     public void withdraw(double amount) {
+        if (this.frozen) {
+            throw new IllegalStateException("Account is frozen.");
+        }
+
         if (amount > 0 && amount <= this.balance) {
             this.balance -= amount;
-            this.transactionHistory.add("Withdrew: $" + amount); // Adds withdraw to transaction history
+            this.transactionHistory.add("Withdrew: $" + amount);
         } else {
             throw new IllegalArgumentException();
         }
@@ -68,5 +84,19 @@ public class BankAccount {
 
         this.balance += interestAmount;
         this.transactionHistory.add("Interest payment: $" + interestAmount);
+    }
+
+    public boolean isFrozen() {
+        return this.frozen;
+    }
+
+    public void freezeAccount() {
+        this.frozen = true;
+        this.transactionHistory.add("Account frozen.");
+    }
+
+    public void unfreezeAccount() {
+        this.frozen = false;
+        this.transactionHistory.add("Account unfrozen.");
     }
 }
