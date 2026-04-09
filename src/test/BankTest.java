@@ -150,4 +150,38 @@ public class BankTest {
 
         assertFalse(bank.getAccounts().get(1).isFrozen());
     }
+
+    @Test
+    public void testChangeCurrentAccount() {
+        Bank bank = new Bank();
+        bank.createAccount("nailong", "Saving");
+
+        bank.changeCurrentAccount(1);
+
+        assertEquals("nailong", bank.getCurrentAccount().getAccountName());
+    }
+
+    @Test
+    public void testChangeCurrentAccountInvalidIndex() {
+        Bank bank = new Bank();
+
+        try {
+            bank.changeCurrentAccount(5);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+    }
+
+    @Test
+    public void testCollectFeeInsufficientBalance() {
+        Bank bank = new Bank();
+
+        try {
+            bank.collectFeeFromAccount(0, 10);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+    }
 }

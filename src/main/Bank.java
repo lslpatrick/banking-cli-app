@@ -29,10 +29,14 @@ public class Bank {
         return accounts.get(currentAccountIndex);
     }
 
-    public void changeCurrentAccount(int newAccountIndex) {
-        if (newAccountIndex < 0 || newAccountIndex >= accounts.size()) {
+    public void checkIndexAvailability(int index) {
+        if (index < 0 || index >= accounts.size()) {
             throw new IllegalArgumentException("Invalid account index.");
         }
+    }
+
+    public void changeCurrentAccount(int newAccountIndex) {
+        checkIndexAvailability(newAccountIndex);
         currentAccountIndex = newAccountIndex;
     }
 
@@ -61,16 +65,14 @@ public class Bank {
 
 
     public void transferBetweenAccounts(int targetAccountIndex, double amount) {
-        if (targetAccountIndex < 0 || targetAccountIndex >= accounts.size()) {
-            throw new IllegalArgumentException();
-        }
+        checkIndexAvailability(targetAccountIndex);
 
         if (targetAccountIndex == currentAccountIndex) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Cannot transfer to the same account.");
         }
 
         if (amount <= 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Transfer amount must be positive.");
         }
 
         BankAccount targetAccount = accounts.get(targetAccountIndex);
@@ -79,13 +81,14 @@ public class Bank {
     }
 
     public void collectFeeFromAccount(int accountIndex, double feeAmount) {
-        if (accountIndex < 0 || accountIndex >= accounts.size()) {
-            throw new IllegalArgumentException("Invalid account index.");
+        checkIndexAvailability(accountIndex);
+        if (accounts.get(accountIndex).getBalance() < feeAmount) {
+            throw new IllegalArgumentException("Insufficient balance to collect fee.");
         }
-
         accounts.get(accountIndex).collectFee(feeAmount);
     }
 
+    /* 
     public void collectFeeFromAllAccounts(double feeAmount) {
         if (feeAmount <= 0) {
             throw new IllegalArgumentException("Fee amount must be greater than zero.");
@@ -95,27 +98,20 @@ public class Bank {
             account.collectFee(feeAmount);
         }
     }
+    */
 
     public void addInterestToAccount(int accountIndex, double interestAmount) {
-        if (accountIndex < 0 || accountIndex >= accounts.size()) {
-            throw new IllegalArgumentException("Invalid account index.");
-        }
-
+        checkIndexAvailability(accountIndex);
         accounts.get(accountIndex).addInterestPayment(interestAmount);
     }
 
     public void freezeAccount(int accountIndex) { //Admin
-        if (accountIndex < 0 || accountIndex >= accounts.size()) {
-            throw new IllegalArgumentException("Invalid account index.");
-        }
+        checkIndexAvailability(accountIndex);
         accounts.get(accountIndex).freezeAccount();
     }
 
     public void unfreezeAccount(int accountIndex) { //Admin
-        if (accountIndex < 0 || accountIndex >= accounts.size()) {
-            throw new IllegalArgumentException("Invalid account index.");
-        }
+        checkIndexAvailability(accountIndex);
         accounts.get(accountIndex).unfreezeAccount();
     }
-
 }

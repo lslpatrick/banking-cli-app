@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class MainMenu {
     private static final int EXIT_SELECTION = 10;
     private static final int MAX_SELECTION = 10086;
+    private static final String ADMIN_PASSWORD = "0422";
 
     private Scanner keyboardInput;
     private Bank bank;
@@ -28,11 +29,11 @@ public class MainMenu {
         System.out.println("2. Make a withdraw");
         System.out.println("3. Check balance");
         System.out.println("4. View transaction history");
-        System.out.println("5. Create additional account");
-        System.out.println("6. Change current account");
+        System.out.println("5. Create new account");
+        System.out.println("6. Switch account");
         System.out.println("7. Close current account");
         System.out.println("8. Transfer money to another account");
-        System.out.println("9. Enter/Exit admin mode");
+        System.out.println("9. Enter administrator mode");
         System.out.println("10. Exit the app");
     }
 
@@ -93,7 +94,7 @@ public class MainMenu {
         try {
             bank.getCurrentAccount().deposit(depositAmount);
         } catch (IllegalStateException e) {
-            System.out.println("Account Frozen, Action Fail");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -107,9 +108,9 @@ public class MainMenu {
         try {
             bank.getCurrentAccount().withdraw(withdrawAmount);
         } catch (IllegalStateException e) {
-            System.out.println("Account Frozen, Action Fail");
+            System.out.println(e.getMessage());
         } catch (IllegalArgumentException e) {
-            System.out.println("Withdrawal failed: insufficient funds or invalid amount.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -134,8 +135,8 @@ public class MainMenu {
         System.out.println("2. Checking");
 
         int typeSelection = getUserSelection(2);
-        String accountType;
 
+        String accountType;
         if (typeSelection == 1) {
             accountType = "Saving";
         } else {
@@ -156,7 +157,6 @@ public class MainMenu {
             System.out.println((i + 1) + ". " + accounts.get(i).getAccountName() + " (" + accounts.get(i).getAccountType() + ")");
         }
 
-
         System.out.print("Enter account number: ");
         int newAccountNumber = keyboardInput.nextInt();
 
@@ -164,7 +164,7 @@ public class MainMenu {
             bank.changeCurrentAccount(newAccountNumber - 1);
             System.out.println("Switched to account: " + bank.getCurrentAccount().getAccountName());
         } catch (IllegalArgumentException e) {
-            System.out.println("Invalid account number.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -198,16 +198,36 @@ public class MainMenu {
         System.out.print("Enter target account number: ");
         int targetAccountNumber = keyboardInput.nextInt();
 
-        bank.transferBetweenAccounts(targetAccountNumber - 1, transferAmount);
-        System.out.println("Transfer successful.");
+        try {
+            bank.transferBetweenAccounts(targetAccountNumber - 1, transferAmount);
+            System.out.println("Transfer successful.");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public boolean isCorrectAdminPassword(String password) {
+        return ADMIN_PASSWORD.equals(password);
     }
 
     public void toggleAdminMode() {
-        adminMode = !adminMode;
-        System.out.println("Admin mode is now " + (adminMode ? "ON" : "OFF"));
-
         if (adminMode) {
+            adminMode = false;
+            System.out.println("Admin mode is now OFF");
+            return;
+        }
+
+        System.out.println("Default admin password is 0422. Please change it in the code for better security.");
+        System.out.print("Enter administrator password: ");
+        keyboardInput.nextLine(); // clear leftover newline
+        String password = keyboardInput.nextLine();
+
+        if (isCorrectAdminPassword(password)) {
+            adminMode = true;
+            System.out.println("Admin mode is now ON");
             adminMenu();
+        } else {
+            System.out.println("Incorrect password. Access denied.");
         }
     }
 
@@ -243,15 +263,11 @@ public class MainMenu {
             System.out.println("=== Account List ===");
             System.out.println("Select an account to freeze, unfreeze, collect fee, or add interest.");
 
+            // print all accounts with their status
             for (int i = 0; i < accounts.size(); i++) {
                 BankAccount account = accounts.get(i);
                 String status = account.isFrozen() ? "Frozen" : "Active";
-
-                System.out.println((i + 1) + ". " 
-                    + account.getAccountName()
-                    + " | Type: " + account.getAccountType()
-                    + " | Balance: $" + account.getBalance()
-                    + " | Status: " + status);
+                System.out.println((i + 1) + ". " + account.getAccountName() + " | Type: " + account.getAccountType() + " | Balance: $" + account.getBalance() + " | Status: " + status);
             }
 
             System.out.println((accounts.size() + 1) + ". Exit Account List");

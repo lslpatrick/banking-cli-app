@@ -1,12 +1,11 @@
 package test;
 
 import main.BankAccount;
-import main.MainMenu;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -99,33 +98,33 @@ public class BankAccountTest {
 
     @Test
     public void testCustomAccountName() {
-        BankAccount testAccount = new BankAccount("nailong");
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
         assertEquals("nailong", testAccount.getAccountName());
     }
 
     @Test
     public void testNewAccountBalanceIsZero() {
-        BankAccount testAccount = new BankAccount("nailong");
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
         assertEquals(0, testAccount.getBalance(), 0.01);
     }
 
     @Test
     public void testNewAccountTransactionHistoryIsEmpty() {
-        BankAccount testAccount = new BankAccount("nailong");
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
         assertEquals(0, testAccount.getTransactionHistory().size());
     }
 
     @Test
     public void testDepositWithCustomAccount() {
-        BankAccount testAccount = new BankAccount("nailong");
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
         testAccount.deposit(200);
         assertEquals(200, testAccount.getBalance(), 0.01);
     }
 
     @Test
     public void testMultipleAccountsIndependence() {
-        BankAccount acc1 = new BankAccount("nailong");
-        BankAccount acc2 = new BankAccount("nailong2");
+        BankAccount acc1 = new BankAccount("nailong", "Checking");
+        BankAccount acc2 = new BankAccount("nailong2", "Saving");
 
         acc1.deposit(100);
         acc2.deposit(50);
@@ -135,97 +134,56 @@ public class BankAccountTest {
     }
 
     @Test
-    public void testCannotCloseOnlyRemainingAccount() {
-        MainMenu menu = new MainMenu();
-        menu.closeCurrentAccount();
-        List<BankAccount> accounts = menu.getAccounts();
-        assertEquals(1, accounts.size());
-        assertEquals("Default", menu.getCurrentAccount().getAccountName());
+    public void testFreezeAccount() {
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        testAccount.freezeAccount();
+        assertTrue(testAccount.isFrozen());
     }
 
     @Test
-    public void testCloseAccountSuccessful() {
-        MainMenu menu = new MainMenu();
-        menu.getAccounts().add(new BankAccount("nailong"));
-        menu.setCurrentAccountIndex(1);
-
-        menu.closeCurrentAccount();
-
-        assertEquals(1, menu.getAccounts().size());
-        assertEquals("Default", menu.getCurrentAccount().getAccountName());
+    public void testUnfreezeAccount() {
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        testAccount.freezeAccount();
+        testAccount.unfreezeAccount();
+        assertFalse(testAccount.isFrozen());
     }
 
     @Test
-    public void testCannotCloseAccountWithRemainingBalance() {
-        MainMenu menu = new MainMenu();
-        menu.getAccounts().add(new BankAccount("nailong"));
-        menu.setCurrentAccountIndex(1);
-        menu.getCurrentAccount().deposit(50);
-
-        menu.closeCurrentAccount();
-
-        assertEquals(2, menu.getAccounts().size());
-        assertEquals("nailong", menu.getCurrentAccount().getAccountName());
-    }
-
-    @Test
-    public void testTransferBetweenAccounts() {
-        MainMenu menu = new MainMenu();
-        menu.getAccounts().add(new BankAccount("nailong"));
-        menu.getCurrentAccount().deposit(100);
-        menu.transferBetweenAccounts(1, 40);
-        assertEquals(60, menu.getCurrentAccount().getBalance(), 0.01);
-        assertEquals(40, menu.getAccounts().get(1).getBalance(), 0.01);
-    }
-
-    @Test
-    public void testCannotTransferToSameAccount() {
-        MainMenu menu = new MainMenu();
-        menu.getCurrentAccount().deposit(100);
+    public void testDepositWhenFrozen() {
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        testAccount.freezeAccount();
 
         try {
-            menu.transferBetweenAccounts(0, 40);
+            testAccount.deposit(100);
             fail();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalStateException e) {
             // test passes
         }
     }
 
     @Test
-    public void testTransferBetweenAccountsInvalidTarget() {
-        MainMenu menu = new MainMenu();
-        menu.getCurrentAccount().deposit(100);
+    public void testWithdrawWhenFrozen() {
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        testAccount.deposit(100);
+        testAccount.freezeAccount();
 
         try {
-            menu.transferBetweenAccounts(5, 40);
+            testAccount.withdraw(50);
             fail();
-        } catch (IllegalArgumentException e) {
-            // Test passes
+        } catch (IllegalStateException e) {
+            // test passes
         }
     }
 
     @Test
-    public void testCollectFeeFromExistingAccount() {
-        MainMenu menu = new MainMenu();
-        menu.getCurrentAccount().deposit(100);
-
-        menu.collectFeeFromAccount(0, 10);
-
-        assertEquals(90, menu.getCurrentAccount().getBalance(), 0.01);
-        assertEquals(2, menu.getCurrentAccount().getTransactionHistory().size());
-        assertEquals("Collected fee: $10.0", menu.getCurrentAccount().getTransactionHistory().get(1));
+    public void testDefaultAccountType() {
+        BankAccount testAccount = new BankAccount();
+        assertEquals("Checking", testAccount.getAccountType());
     }
 
     @Test
-    public void testAddInterestToExistingAccount() {
-        MainMenu menu = new MainMenu();
-        menu.getCurrentAccount().deposit(100);
-
-        menu.addInterestToAccount(0, 5);
-
-        assertEquals(105, menu.getCurrentAccount().getBalance(), 0.01);
-        assertEquals(2, menu.getCurrentAccount().getTransactionHistory().size());
-        assertEquals("Interest payment: $5.0",
-                menu.getCurrentAccount().getTransactionHistory().get(1));
+    public void testCustomAccountType() {
+        BankAccount testAccount = new BankAccount("nailong", "Saving");
+        assertEquals("Saving", testAccount.getAccountType());
     }
 }
