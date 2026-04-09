@@ -51,7 +51,7 @@ public class BankAccount {
             this.balance += amount;
             this.transactionHistory.add("Deposited: $" + amount);
         } else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Deposit amount must be positive.");
         }
     }
 
@@ -64,13 +64,13 @@ public class BankAccount {
             this.balance -= amount;
             this.transactionHistory.add("Withdrew: $" + amount);
         } else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Withdrawal amount must be positive and not exceed the balance.");
         }
     }
 
     public void collectFee(double feeAmount) {
         if (feeAmount <= 0 || feeAmount > this.balance) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Fee amount must be positive and not exceed the balance.");
         }
 
         this.balance -= feeAmount;
@@ -79,7 +79,7 @@ public class BankAccount {
 
     public void addInterestPayment(double interestAmount) {
         if (interestAmount <= 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Interest amount must be positive.");
         }
 
         this.balance += interestAmount;
