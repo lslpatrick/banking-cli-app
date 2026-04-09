@@ -26,4 +26,26 @@ public class MainMenuTest {
         MainMenu menu = new MainMenu();
         assertFalse(menu.isCorrectAdminPassword(""));
     }
+
+    @Test
+    public void testUpdateAdminPasswordSuccess() {
+        MainMenu menu = new MainMenu();
+        assertTrue(menu.updateAdminPassword("0422", "5678"));
+        assertTrue(menu.isCorrectAdminPassword("5678"));
+        assertFalse(menu.isCorrectAdminPassword("0422"));
+    }
+
+    @Test
+    public void testUpdateAdminPasswordWrongCurrentPassword() {
+        MainMenu menu = new MainMenu();
+        assertFalse(menu.updateAdminPassword("wrong", "5678"));
+        assertTrue(menu.isCorrectAdminPassword("0422"));
+    }
+
+    @Test
+    public void testUpdateAdminPasswordEmptyNewPassword() {
+        MainMenu menu = new MainMenu();
+        assertFalse(menu.updateAdminPassword("0422", ""));
+        assertTrue(menu.isCorrectAdminPassword("0422"));
+    }
 }

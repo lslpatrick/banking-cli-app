@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class MainMenu {
     private static final int EXIT_SELECTION = 10;
     private static final int MAX_SELECTION = 10086;
-    private static final String ADMIN_PASSWORD = "0422";
+    private String ADMIN_PASSWORD;
 
     private Scanner keyboardInput;
     private Bank bank;
@@ -17,6 +17,7 @@ public class MainMenu {
         this.keyboardInput = new Scanner(System.in);
         this.bank = new Bank();
         this.adminMode = false;
+        this.ADMIN_PASSWORD = "0422";
     }
 
     public void displayOptions() {
@@ -210,6 +211,35 @@ public class MainMenu {
         return ADMIN_PASSWORD.equals(password);
     }
 
+    public boolean updateAdminPassword(String currentPassword, String newPassword) {
+        if (!isCorrectAdminPassword(currentPassword)) {
+            return false;
+        }
+
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            return false;
+        }
+
+        this.ADMIN_PASSWORD = newPassword;
+        return true;
+    }
+
+    public void changeAdminPassword() {
+        keyboardInput.nextLine();
+
+        System.out.print("Enter current administrator password: ");
+        String currentPassword = keyboardInput.nextLine();
+
+        System.out.print("Enter new administrator password: ");
+        String newPassword = keyboardInput.nextLine();
+
+        if (updateAdminPassword(currentPassword, newPassword)) {
+            System.out.println("Administrator password changed successfully.");
+        } else {
+            System.out.println("Password change failed.");
+        }
+    }
+
     public void toggleAdminMode() {
         if (adminMode) {
             adminMode = false;
@@ -219,7 +249,7 @@ public class MainMenu {
 
         System.out.println("Default admin password is 0422. Please change it in the code for better security.");
         System.out.print("Enter administrator password: ");
-        keyboardInput.nextLine(); // clear leftover newline
+        keyboardInput.nextLine();
         String password = keyboardInput.nextLine();
 
         if (isCorrectAdminPassword(password)) {
@@ -236,15 +266,19 @@ public class MainMenu {
             System.out.println();
             System.out.println("=== Admin Menu ===");
             System.out.println("1. View All Accounts");
-            System.out.println("2. Exit Admin Mode");
+            System.out.println("2. Change Admin Password");
+            System.out.println("3. Exit Admin Mode");
 
-            int selection = getUserSelection(2);
+            int selection = getUserSelection(3);
 
             switch (selection) {
                 case 1:
                     viewAllAccountsAdmin();
                     break;
                 case 2:
+                    changeAdminPassword();
+                    break;
+                case 3:
                     adminMode = false;
                     System.out.println("Admin mode is now OFF");
                     break;
