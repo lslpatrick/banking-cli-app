@@ -19,10 +19,10 @@
 9. A bank adminstrator should be able to add an interest payment to an existing account when necessary.
 
 ## What user stories were completed this iteration?
-2,3,4,5,6,7
+2,3,4,5,6,7,8,9
 
 ## What user stories do you intend to complete next iteration?
-8, 9
+All Finished till this point
 ## Is there anything that you implemented but doesn't currently work?
 No
 
