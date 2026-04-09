@@ -102,34 +102,6 @@ public class MainMenu {
         }
     }
 
-    public List<BankAccount> getAccounts() {
-        return bank.getAccounts();
-    }
-
-    public BankAccount getCurrentAccount() {
-        return bank.getCurrentAccount();
-    }
-
-    public void setCurrentAccountIndex(int index) {
-        bank.setCurrentAccountIndex(index);
-    }
-
-    public void transferBetweenAccounts(int targetAccountIndex, double amount) {
-        bank.transferBetweenAccounts(targetAccountIndex, amount);
-    }
-
-    public void collectFeeFromAccount(int accountIndex, double feeAmount) {
-        bank.collectFeeFromAccount(accountIndex, feeAmount);
-    }
-
-    public void collectFeeFromAllAccounts(double feeAmount) {
-        bank.collectFeeFromAllAccounts(feeAmount);
-    }
-
-    public void addInterestToAccount(int accountIndex, double interestAmount) {
-        bank.addInterestToAccount(accountIndex, interestAmount);
-    }
-
     public void performDeposit() {
         double depositAmount = -1;
         while (depositAmount < 0) {

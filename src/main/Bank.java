@@ -29,7 +29,7 @@ public class Bank {
         return accounts.get(currentAccountIndex);
     }
 
-     public void changeCurrentAccount(int newAccountIndex) {
+    public void changeCurrentAccount(int newAccountIndex) {
         if (newAccountIndex < 0 || newAccountIndex >= accounts.size()) {
             throw new IllegalArgumentException("Invalid account index.");
         }
