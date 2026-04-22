@@ -21,7 +21,7 @@ public class MainMenu {
     public void displayOptions() {
         System.out.println();
         System.out.println("Welcome to the 237 Bank App!");
-        System.out.println("Current account: " + bank.getCurrentAccount().getAccountName()+ " (" + bank.getCurrentAccount().getAccountType() + ")");
+        System.out.println("Current account: " + bank.getCurrentAccount().getAccountName() + " (" + bank.getCurrentAccount().getAccountType() + ")");
         System.out.println("Admin mode: " + (adminMenu.isAdminMode() ? "ON" : "OFF"));
         System.out.println();
         System.out.println("1. Make a deposit");
@@ -84,11 +84,11 @@ public class MainMenu {
     }
 
     public void authenticateCustomer() {
-        System.out.println("=== Customer Access ===");
+        System.out.println("=== Customer Login ===");
 
         if (!bank.hasCustomerPin()) {
             System.out.println("No customer PIN has been set.");
-            System.out.println("Please create a 4-digit PIN to access the bank app.");
+            System.out.println("Please create a 4-digit PIN before using account services.");
 
             while (true) {
                 System.out.print("Enter new PIN: ");
@@ -110,7 +110,6 @@ public class MainMenu {
                     System.out.println(e.getMessage());
                 }
             }
-
             return;
         }
 
@@ -121,7 +120,7 @@ public class MainMenu {
             String pin = keyboardInput.nextLine();
 
             if (bank.verifyCustomerPin(pin)) {
-                System.out.println("Access granted.");
+                System.out.println("Login successful.");
                 return;
             }
 
