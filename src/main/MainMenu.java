@@ -83,7 +83,59 @@ public class MainMenu {
         }
     }
 
+    public void authenticateCustomer() {
+        System.out.println("=== Customer Access ===");
+
+        if (!bank.hasCustomerPin()) {
+            System.out.println("No customer PIN has been set.");
+            System.out.println("Please create a 4-digit PIN to access the bank app.");
+
+            while (true) {
+                System.out.print("Enter new PIN: ");
+                String pin = keyboardInput.nextLine();
+
+                System.out.print("Confirm new PIN: ");
+                String confirmPin = keyboardInput.nextLine();
+
+                if (!pin.equals(confirmPin)) {
+                    System.out.println("PINs do not match. Please try again.");
+                    continue;
+                }
+
+                try {
+                    bank.setCustomerPin(pin);
+                    System.out.println("PIN created successfully.");
+                    break;
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+
+            return;
+        }
+
+        int attemptsRemaining = 3;
+
+        while (attemptsRemaining > 0) {
+            System.out.print("Enter customer PIN: ");
+            String pin = keyboardInput.nextLine();
+
+            if (bank.verifyCustomerPin(pin)) {
+                System.out.println("Access granted.");
+                return;
+            }
+
+            attemptsRemaining--;
+            System.out.println("Incorrect PIN. Attempts remaining: " + attemptsRemaining);
+        }
+
+        System.out.println("Too many incorrect attempts. Exiting app.");
+        System.exit(0);
+    }
+
     public void run() {
+        authenticateCustomer();
+
         int selection = -1;
         while (selection != EXIT_SELECTION) {
             displayOptions();

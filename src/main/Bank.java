@@ -6,10 +6,12 @@ import java.util.List;
 public class Bank {
     private List<BankAccount> accounts;
     private int currentAccountIndex;
+    private String customerPin;
 
     public Bank() {
         this.accounts = new ArrayList<>();
         this.currentAccountIndex = 0;
+        this.customerPin = null;
         this.accounts.add(new BankAccount("Default", "Checking"));
     }
 
@@ -27,6 +29,38 @@ public class Bank {
 
     public BankAccount getCurrentAccount() {
         return accounts.get(currentAccountIndex);
+    }
+
+    public boolean hasCustomerPin() {
+        return customerPin != null;
+    }
+
+    public boolean isValidPinFormat(String pin) {
+        return pin != null && pin.matches("\\d{4}");
+    }
+
+    public void setCustomerPin(String pin) {
+        if (!isValidPinFormat(pin)) {
+            throw new IllegalArgumentException("PIN must be exactly 4 digits.");
+        }
+        this.customerPin = pin;
+    }
+
+    public boolean verifyCustomerPin(String pin) {
+        return customerPin != null && customerPin.equals(pin);
+    }
+
+    public boolean changeCustomerPin(String currentPin, String newPin) {
+        if (!verifyCustomerPin(currentPin)) {
+            return false;
+        }
+
+        if (!isValidPinFormat(newPin)) {
+            return false;
+        }
+
+        this.customerPin = newPin;
+        return true;
     }
 
     public void checkIndexAvailability(int index) {
@@ -63,7 +97,6 @@ public class Bank {
         return closedAccountName;
     }
 
-
     public void transferBetweenAccounts(int targetAccountIndex, double amount) {
         checkIndexAvailability(targetAccountIndex);
 
@@ -88,29 +121,17 @@ public class Bank {
         accounts.get(accountIndex).collectFee(feeAmount);
     }
 
-    /* 
-    public void collectFeeFromAllAccounts(double feeAmount) {
-        if (feeAmount <= 0) {
-            throw new IllegalArgumentException("Fee amount must be greater than zero.");
-        }
-
-        for (BankAccount account : accounts) {
-            account.collectFee(feeAmount);
-        }
-    }
-    */
-
     public void addInterestToAccount(int accountIndex, double interestAmount) {
         checkIndexAvailability(accountIndex);
         accounts.get(accountIndex).addInterestPayment(interestAmount);
     }
 
-    public void freezeAccount(int accountIndex) { //Admin
+    public void freezeAccount(int accountIndex) {
         checkIndexAvailability(accountIndex);
         accounts.get(accountIndex).freezeAccount();
     }
 
-    public void unfreezeAccount(int accountIndex) { //Admin
+    public void unfreezeAccount(int accountIndex) {
         checkIndexAvailability(accountIndex);
         accounts.get(accountIndex).unfreezeAccount();
     }
