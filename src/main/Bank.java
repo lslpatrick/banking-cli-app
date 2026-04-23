@@ -1,5 +1,8 @@
 package main;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,6 +137,34 @@ public class Bank {
 
         double interestAmount = accounts.get(accountIndex).getBalance() * 0.02;
         accounts.get(accountIndex).addInterestPayment(interestAmount);
+    }
+
+    public void generateBankStatement(int accountIndex, String fileName) throws IOException {
+        checkIndexAvailability(accountIndex);
+
+        if (fileName == null || fileName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Statement file name cannot be empty.");
+        }
+
+        BankAccount account = accounts.get(accountIndex);
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
+            writer.println("237 Bank Statement");
+            writer.println("==================");
+            writer.println("Account Name: " + account.getAccountName());
+            writer.println("Account Type: " + account.getAccountType());
+            writer.println("Current Balance: $" + account.getBalance());
+            writer.println();
+            writer.println("Transaction History:");
+
+            if (account.getTransactionHistory().isEmpty()) {
+                writer.println("No transactions history found.");
+            } else {
+                for (String transaction : account.getTransactionHistory()) {
+                    writer.println(transaction);
+                }
+            }
+        }
     }
 
     public void freezeAccount(int accountIndex) {

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class BankAccount {
-    private static final double OVERDRAW_LIMIT = 100;
+    private static final double OVERDRAW_LIMIT = 200;
     private String accountName;
     private String accountType;
     private double balance;
@@ -81,8 +81,11 @@ public class BankAccount {
             this.transactionHistory.add("Withdrew: $" + amount);
             return false;
         }
-        if (!"Checking".equals(this.accountType) || this.balance - amount < -OVERDRAW_LIMIT) {
-            throw new IllegalArgumentException("Unable.");
+        if (this.balance - amount < -OVERDRAW_LIMIT) {
+            throw new IllegalArgumentException("Withdrawal exceeds overdraw limit.");
+        }
+        if (!"Checking".equals(this.accountType)) {
+            throw new IllegalArgumentException("Only checking accounts can overdraw.");
         }
         this.balance -= amount;
         this.transactionHistory.add("Withdrew: $" + amount);

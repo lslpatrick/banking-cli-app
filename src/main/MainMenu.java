@@ -3,7 +3,7 @@ package main;
 import java.util.Scanner;
 
 public class MainMenu {
-    private static final int EXIT_SELECTION = 10;
+    private static final int EXIT_SELECTION = 11;
     private static final int MAX_SELECTION = 10086;
 
     private Scanner keyboardInput;
@@ -33,7 +33,8 @@ public class MainMenu {
         System.out.println("7. Close current account");
         System.out.println("8. Transfer money to another account");
         System.out.println("9. Enter administrator mode");
-        System.out.println("10. Exit the app");
+        System.out.println("10. Generate bank statement");
+        System.out.println("11. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -75,6 +76,9 @@ public class MainMenu {
                 adminMenu.toggleAdminMode();
                 break;
             case 10:
+                customerMenu.generateBankStatement();
+                break;
+            case 11:
                 System.out.println("Goodbye!");
                 break;
             default:
