@@ -3,14 +3,21 @@ package test;
 import main.Bank;
 import main.BankAccount;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class BankTest {
+
+    @TempDir
+    Path tempDir;
 
     @Test
     public void testCannotCloseOnlyRemainingAccount() {
@@ -96,6 +103,23 @@ public class BankTest {
     }
 
     @Test
+    public void testTransferCannotUseOverdrawProtection() {
+        Bank bank = new Bank();
+        bank.createAccount("nailong", "Checking");
+        bank.getCurrentAccount().deposit(20);
+
+        try {
+            bank.transferBetweenAccounts(1, 30);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertEquals(20, bank.getCurrentAccount().getBalance(), 0.01);
+        assertEquals(0, bank.getAccounts().get(1).getBalance(), 0.01);
+    }
+
+    @Test
     public void testCollectFeeFromExistingAccount() {
         Bank bank = new Bank();
         bank.getCurrentAccount().deposit(100);
@@ -118,6 +142,36 @@ public class BankTest {
         assertEquals(2, bank.getCurrentAccount().getTransactionHistory().size());
         assertEquals("Interest payment: $5.0",
                 bank.getCurrentAccount().getTransactionHistory().get(1));
+    }
+
+    @Test
+    public void testAddInterestToSavingAccount() {
+        Bank bank = new Bank();
+        bank.createAccount("nailong", "Saving");
+        bank.setCurrentAccountIndex(1);
+        bank.getCurrentAccount().deposit(100);
+
+        bank.addInterestToSavingAccount(1);
+
+        assertEquals(102, bank.getCurrentAccount().getBalance(), 0.01);
+        assertEquals(2, bank.getCurrentAccount().getTransactionHistory().size());
+        assertEquals("Interest payment: $2.0",
+                bank.getCurrentAccount().getTransactionHistory().get(1));
+    }
+
+    @Test
+    public void testCannotAddSavingInterestToCheckingAccount() {
+        Bank bank = new Bank();
+        bank.getCurrentAccount().deposit(100);
+
+        try {
+            bank.addInterestToSavingAccount(0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertEquals(100, bank.getCurrentAccount().getBalance(), 0.01);
     }
 
     @Test
@@ -183,5 +237,133 @@ public class BankTest {
         } catch (IllegalArgumentException e) {
             // test passes
         }
+    }
+
+    @Test
+    public void testCollectFeeCannotUseOverdrawProtection() {
+        Bank bank = new Bank();
+        bank.getCurrentAccount().withdrawWithOverdrawProtection(50);
+
+        try {
+            bank.collectFeeFromAccount(0, 10);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertEquals(-50, bank.getCurrentAccount().getBalance(), 0.01);
+    }
+
+    @Test
+    public void testSetCustomerPinSuccess() {
+        Bank bank = new Bank();
+        bank.setCustomerPin("1234");
+
+        assertTrue(bank.hasCustomerPin());
+        assertTrue(bank.verifyCustomerPin("1234"));
+    }
+
+    @Test
+    public void testSetCustomerPinInvalidFormat() {
+        Bank bank = new Bank();
+
+        try {
+            bank.setCustomerPin("12");
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertFalse(bank.hasCustomerPin());
+    }
+
+    @Test
+    public void testVerifyCustomerPinWrongPin() {
+        Bank bank = new Bank();
+        bank.setCustomerPin("1234");
+
+        assertFalse(bank.verifyCustomerPin("9999"));
+    }
+
+    @Test
+    public void testChangeCustomerPinSuccess() {
+        Bank bank = new Bank();
+        bank.setCustomerPin("1234");
+
+        assertTrue(bank.changeCustomerPin("1234", "5678"));
+        assertTrue(bank.verifyCustomerPin("5678"));
+        assertFalse(bank.verifyCustomerPin("1234"));
+    }
+
+    @Test
+    public void testGenerateBankStatementCreatesTextFile() throws Exception {
+        Bank bank = new Bank();
+        bank.getCurrentAccount().deposit(100);
+        bank.getCurrentAccount().withdrawWithOverdrawProtection(40);
+        Path statementPath = tempDir.resolve("statement.txt");
+
+        bank.generateBankStatement(0, statementPath.toString());
+
+        String statement = Files.readString(statementPath);
+        assertTrue(Files.exists(statementPath));
+        assertTrue(statement.contains("237 Bank Statement"));
+        assertTrue(statement.contains("Account Name: Default"));
+        assertTrue(statement.contains("Account Type: Checking"));
+        assertTrue(statement.contains("Current Balance: $60.0"));
+        assertTrue(statement.contains("Deposited: $100.0"));
+        assertTrue(statement.contains("Withdrew: $40.0"));
+    }
+
+    @Test
+    public void testGenerateBankStatementWithInvalidAccountIndex() throws Exception {
+        Bank bank = new Bank();
+        Path statementPath = tempDir.resolve("statement.txt");
+
+        try {
+            bank.generateBankStatement(5, statementPath.toString());
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertFalse(Files.exists(statementPath));
+    }
+
+    @Test
+    public void testUpdateSavingsInterestRate() {
+        Bank bank = new Bank();
+
+        bank.updateSavingsInterestRate(0.05);
+
+        assertEquals(0.05, bank.getSavingsInterestRate(), 0.01);
+    }
+
+    @Test
+    public void testUpdatedSavingsInterestRateChangesInterestPayment() {
+        Bank bank = new Bank();
+        bank.createAccount("nailong", "Saving");
+        bank.setCurrentAccountIndex(1);
+        bank.getCurrentAccount().deposit(100);
+
+        bank.updateSavingsInterestRate(0.05);
+        bank.addInterestToSavingAccount(1);
+
+        assertEquals(105, bank.getCurrentAccount().getBalance(), 0.01);
+        assertEquals("Interest payment: $5.0",
+                bank.getCurrentAccount().getTransactionHistory().get(1));
+    }
+
+    @Test
+    public void testCannotUpdateSavingsInterestRateToZero() {
+        Bank bank = new Bank();
+
+        try {
+            bank.updateSavingsInterestRate(0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertEquals(0.02, bank.getSavingsInterestRate(), 0.01);
     }
 }

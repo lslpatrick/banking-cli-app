@@ -1,15 +1,22 @@
 package main;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Bank {
     private List<BankAccount> accounts;
     private int currentAccountIndex;
+    private String customerPin;
+    private double savingsInterestRate;
 
     public Bank() {
         this.accounts = new ArrayList<>();
         this.currentAccountIndex = 0;
+        this.customerPin = null;
+        this.savingsInterestRate = 0.02;
         this.accounts.add(new BankAccount("Default", "Checking"));
     }
 
@@ -27,6 +34,50 @@ public class Bank {
 
     public BankAccount getCurrentAccount() {
         return accounts.get(currentAccountIndex);
+    }
+
+    public double getSavingsInterestRate() {
+        return savingsInterestRate;
+    }
+
+    public void updateSavingsInterestRate(double newSavingsInterestRate) {
+        if (newSavingsInterestRate <= 0) {
+            throw new IllegalArgumentException("Savings interest rate must be positive.");
+        }
+
+        this.savingsInterestRate = newSavingsInterestRate;
+    }
+
+    public boolean hasCustomerPin() {
+        return customerPin != null;
+    }
+
+    public boolean isValidPinFormat(String pin) {
+        return pin != null && pin.matches("\\d{4}");
+    }
+
+    public void setCustomerPin(String pin) {
+        if (!isValidPinFormat(pin)) {
+            throw new IllegalArgumentException("PIN must be exactly 4 digits.");
+        }
+        this.customerPin = pin;
+    }
+
+    public boolean verifyCustomerPin(String pin) {
+        return customerPin != null && customerPin.equals(pin);
+    }
+
+    public boolean changeCustomerPin(String currentPin, String newPin) {
+        if (!verifyCustomerPin(currentPin)) {
+            return false;
+        }
+
+        if (!isValidPinFormat(newPin)) {
+            return false;
+        }
+
+        this.customerPin = newPin;
+        return true;
     }
 
     public void checkIndexAvailability(int index) {
@@ -63,7 +114,6 @@ public class Bank {
         return closedAccountName;
     }
 
-
     public void transferBetweenAccounts(int targetAccountIndex, double amount) {
         checkIndexAvailability(targetAccountIndex);
 
@@ -88,29 +138,55 @@ public class Bank {
         accounts.get(accountIndex).collectFee(feeAmount);
     }
 
-    /* 
-    public void collectFeeFromAllAccounts(double feeAmount) {
-        if (feeAmount <= 0) {
-            throw new IllegalArgumentException("Fee amount must be greater than zero.");
-        }
-
-        for (BankAccount account : accounts) {
-            account.collectFee(feeAmount);
-        }
-    }
-    */
-
     public void addInterestToAccount(int accountIndex, double interestAmount) {
         checkIndexAvailability(accountIndex);
         accounts.get(accountIndex).addInterestPayment(interestAmount);
     }
 
-    public void freezeAccount(int accountIndex) { //Admin
+    public void addInterestToSavingAccount(int accountIndex) {
+        checkIndexAvailability(accountIndex);
+        if (!accounts.get(accountIndex).getAccountType().equals("Saving")) {
+            throw new IllegalArgumentException("Only saving accounts can use this interest option.");
+        }
+
+        double interestAmount = accounts.get(accountIndex).getBalance() * savingsInterestRate;
+        accounts.get(accountIndex).addInterestPayment(interestAmount);
+    }
+
+    public void generateBankStatement(int accountIndex, String fileName) throws IOException {
+        checkIndexAvailability(accountIndex);
+
+        if (fileName == null || fileName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Statement file name cannot be empty.");
+        }
+
+        BankAccount account = accounts.get(accountIndex);
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
+            writer.println("237 Bank Statement");
+            writer.println("==================");
+            writer.println("Account Name: " + account.getAccountName());
+            writer.println("Account Type: " + account.getAccountType());
+            writer.println("Current Balance: $" + account.getBalance());
+            writer.println();
+            writer.println("Transaction History:");
+
+            if (account.getTransactionHistory().isEmpty()) {
+                writer.println("No transactions history found.");
+            } else {
+                for (String transaction : account.getTransactionHistory()) {
+                    writer.println(transaction);
+                }
+            }
+        }
+    }
+
+    public void freezeAccount(int accountIndex) {
         checkIndexAvailability(accountIndex);
         accounts.get(accountIndex).freezeAccount();
     }
 
-    public void unfreezeAccount(int accountIndex) { //Admin
+    public void unfreezeAccount(int accountIndex) {
         checkIndexAvailability(accountIndex);
         accounts.get(accountIndex).unfreezeAccount();
     }
