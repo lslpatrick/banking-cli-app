@@ -56,8 +56,68 @@ public class BankAccountTest {
             testAccount.withdraw(30);
             fail();
         } catch (IllegalArgumentException e) {
+            // do nothing,test passes
+        }
+    }
+
+    @Test
+    public void testWithdrawWithOverdrawProtection() {
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        testAccount.deposit(20);
+        boolean usedOverdrawProtection = testAccount.withdrawWithOverdrawProtection(70);
+
+        assertTrue(usedOverdrawProtection);
+        assertEquals(-50, testAccount.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testWithdrawWithOverdrawProtectionLimit() {
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        boolean usedOverdrawProtection = testAccount.withdrawWithOverdrawProtection(100);
+
+        assertTrue(usedOverdrawProtection);
+        assertEquals(-100, testAccount.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testCannotWithdrawPastOverdrawProtectionLimit() {
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        try {
+            testAccount.withdrawWithOverdrawProtection(101);
+            fail();
+        } catch (IllegalArgumentException e) {
             // do nothing, test passes
         }
+
+        assertEquals(0, testAccount.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testSavingCannotUseOverdrawProtection() {
+        BankAccount testAccount = new BankAccount("nailong", "Saving");
+        testAccount.deposit(20);
+        try {
+            testAccount.withdrawWithOverdrawProtection(30);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // do nothing, test passes。
+        }
+
+        assertEquals(20, testAccount.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testWithdrawDoesNotUseOverdrawProtection() {
+        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        testAccount.deposit(20);
+        try {
+            testAccount.withdraw(30);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // do nothing, test passes
+        }
+
+        assertEquals(20, testAccount.getBalance(), 0.01);
     }
 
     @Test

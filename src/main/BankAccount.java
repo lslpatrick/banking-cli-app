@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class BankAccount {
+    private static final double OVERDRAW_LIMIT = 100;
     private String accountName;
     private String accountType;
     private double balance;
@@ -66,6 +67,26 @@ public class BankAccount {
         } else {
             throw new IllegalArgumentException("Withdrawal amount must be positive and not exceed the balance.");
         }
+    }
+
+    public boolean withdrawWithOverdrawProtection(double amount) {
+        if (this.frozen) {
+            throw new IllegalStateException("Account is frozen.");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Withdrawal amount must be positive and not exceed the balance.");
+        }
+        if (amount <= this.balance) {
+            this.balance -= amount;
+            this.transactionHistory.add("Withdrew: $" + amount);
+            return false;
+        }
+        if (!"Checking".equals(this.accountType) || this.balance - amount < -OVERDRAW_LIMIT) {
+            throw new IllegalArgumentException("Unable.");
+        }
+        this.balance -= amount;
+        this.transactionHistory.add("Withdrew: $" + amount);
+        return true;
     }
 
     public void collectFee(double feeAmount) {

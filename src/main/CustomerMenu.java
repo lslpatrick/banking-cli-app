@@ -45,7 +45,10 @@ public class CustomerMenu {
         }
 
         try {
-            bank.getCurrentAccount().withdraw(withdrawAmount);
+            boolean usedOverdrawProtection = bank.getCurrentAccount().withdrawWithOverdrawProtection(withdrawAmount);
+            if (usedOverdrawProtection) {
+                System.out.println("You are using overdraw.");
+            }
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         } catch (IllegalArgumentException e) {

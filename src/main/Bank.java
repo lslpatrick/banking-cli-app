@@ -126,6 +126,16 @@ public class Bank {
         accounts.get(accountIndex).addInterestPayment(interestAmount);
     }
 
+    public void addInterestToSavingAccount(int accountIndex) {
+        checkIndexAvailability(accountIndex);
+        if (!accounts.get(accountIndex).getAccountType().equals("Saving")) {
+            throw new IllegalArgumentException("Only saving accounts can use this interest option.");
+        }
+
+        double interestAmount = accounts.get(accountIndex).getBalance() * 0.02;
+        accounts.get(accountIndex).addInterestPayment(interestAmount);
+    }
+
     public void freezeAccount(int accountIndex) {
         checkIndexAvailability(accountIndex);
         accounts.get(accountIndex).freezeAccount();
