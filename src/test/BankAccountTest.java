@@ -73,17 +73,17 @@ public class BankAccountTest {
     @Test
     public void testWithdrawWithOverdrawProtectionLimit() {
         BankAccount testAccount = new BankAccount("nailong", "Checking");
-        boolean usedOverdrawProtection = testAccount.withdrawWithOverdrawProtection(100);
+        boolean usedOverdrawProtection = testAccount.withdrawWithOverdrawProtection(200);
 
         assertTrue(usedOverdrawProtection);
-        assertEquals(-100, testAccount.getBalance(), 0.01);
+        assertEquals(-200, testAccount.getBalance(), 0.01);
     }
 
     @Test
     public void testCannotWithdrawPastOverdrawProtectionLimit() {
         BankAccount testAccount = new BankAccount("nailong", "Checking");
         try {
-            testAccount.withdrawWithOverdrawProtection(101);
+            testAccount.withdrawWithOverdrawProtection(201);
             fail();
         } catch (IllegalArgumentException e) {
             // do nothing, test passes

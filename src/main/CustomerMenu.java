@@ -1,5 +1,6 @@
 package main;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -145,6 +146,24 @@ public class CustomerMenu {
             System.out.println("Transfer successful.");
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public void generateBankStatement() {
+        System.out.print("Enter statement file name: ");
+        String fileName = keyboardInput.next();
+
+        if (!fileName.endsWith(".txt")) {
+            fileName += ".txt";
+        }
+
+        try {
+            bank.generateBankStatement(bank.getCurrentAccountIndex(), fileName);
+            System.out.println("Bank statement generated: " + fileName);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println("Unable to generate bank statement.");
         }
     }
 }

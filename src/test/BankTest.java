@@ -3,14 +3,21 @@ package test;
 import main.Bank;
 import main.BankAccount;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class BankTest {
+
+    @TempDir
+    Path tempDir;
 
     @Test
     public void testCannotCloseOnlyRemainingAccount() {
@@ -286,5 +293,39 @@ public class BankTest {
         assertTrue(bank.changeCustomerPin("1234", "5678"));
         assertTrue(bank.verifyCustomerPin("5678"));
         assertFalse(bank.verifyCustomerPin("1234"));
+    }
+
+    @Test
+    public void testGenerateBankStatementCreatesTextFile() throws Exception {
+        Bank bank = new Bank();
+        bank.getCurrentAccount().deposit(100);
+        bank.getCurrentAccount().withdrawWithOverdrawProtection(40);
+        Path statementPath = tempDir.resolve("statement.txt");
+
+        bank.generateBankStatement(0, statementPath.toString());
+
+        String statement = Files.readString(statementPath);
+        assertTrue(Files.exists(statementPath));
+        assertTrue(statement.contains("237 Bank Statement"));
+        assertTrue(statement.contains("Account Name: Default"));
+        assertTrue(statement.contains("Account Type: Checking"));
+        assertTrue(statement.contains("Current Balance: $60.0"));
+        assertTrue(statement.contains("Deposited: $100.0"));
+        assertTrue(statement.contains("Withdrew: $40.0"));
+    }
+
+    @Test
+    public void testGenerateBankStatementWithInvalidAccountIndex() throws Exception {
+        Bank bank = new Bank();
+        Path statementPath = tempDir.resolve("statement.txt");
+
+        try {
+            bank.generateBankStatement(5, statementPath.toString());
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertFalse(Files.exists(statementPath));
     }
 }
