@@ -10,11 +10,13 @@ public class Bank {
     private List<BankAccount> accounts;
     private int currentAccountIndex;
     private String customerPin;
+    private double savingsInterestRate;
 
     public Bank() {
         this.accounts = new ArrayList<>();
         this.currentAccountIndex = 0;
         this.customerPin = null;
+        this.savingsInterestRate = 0.02;
         this.accounts.add(new BankAccount("Default", "Checking"));
     }
 
@@ -32,6 +34,18 @@ public class Bank {
 
     public BankAccount getCurrentAccount() {
         return accounts.get(currentAccountIndex);
+    }
+
+    public double getSavingsInterestRate() {
+        return savingsInterestRate;
+    }
+
+    public void updateSavingsInterestRate(double newSavingsInterestRate) {
+        if (newSavingsInterestRate <= 0) {
+            throw new IllegalArgumentException("Savings interest rate must be positive.");
+        }
+
+        this.savingsInterestRate = newSavingsInterestRate;
     }
 
     public boolean hasCustomerPin() {
@@ -135,7 +149,7 @@ public class Bank {
             throw new IllegalArgumentException("Only saving accounts can use this interest option.");
         }
 
-        double interestAmount = accounts.get(accountIndex).getBalance() * 0.02;
+        double interestAmount = accounts.get(accountIndex).getBalance() * savingsInterestRate;
         accounts.get(accountIndex).addInterestPayment(interestAmount);
     }
 

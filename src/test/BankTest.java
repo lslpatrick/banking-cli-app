@@ -328,4 +328,42 @@ public class BankTest {
 
         assertFalse(Files.exists(statementPath));
     }
+
+    @Test
+    public void testUpdateSavingsInterestRate() {
+        Bank bank = new Bank();
+
+        bank.updateSavingsInterestRate(0.05);
+
+        assertEquals(0.05, bank.getSavingsInterestRate(), 0.01);
+    }
+
+    @Test
+    public void testUpdatedSavingsInterestRateChangesInterestPayment() {
+        Bank bank = new Bank();
+        bank.createAccount("nailong", "Saving");
+        bank.setCurrentAccountIndex(1);
+        bank.getCurrentAccount().deposit(100);
+
+        bank.updateSavingsInterestRate(0.05);
+        bank.addInterestToSavingAccount(1);
+
+        assertEquals(105, bank.getCurrentAccount().getBalance(), 0.01);
+        assertEquals("Interest payment: $5.0",
+                bank.getCurrentAccount().getTransactionHistory().get(1));
+    }
+
+    @Test
+    public void testCannotUpdateSavingsInterestRateToZero() {
+        Bank bank = new Bank();
+
+        try {
+            bank.updateSavingsInterestRate(0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertEquals(0.02, bank.getSavingsInterestRate(), 0.01);
+    }
 }

@@ -88,10 +88,8 @@ public class MainMenu {
     }
 
     public void authenticateCustomer() {
-        System.out.println("=== Customer Login ===");
-
         if (!bank.hasCustomerPin()) {
-            System.out.println("No customer PIN has been set.");
+            System.out.println("=== Customer PIN Setup ===");
             System.out.println("Please create a 4-digit PIN before using account services.");
 
             while (true) {
@@ -116,24 +114,6 @@ public class MainMenu {
             }
             return;
         }
-
-        int attemptsRemaining = 3;
-
-        while (attemptsRemaining > 0) {
-            System.out.print("Enter customer PIN: ");
-            String pin = keyboardInput.nextLine();
-
-            if (bank.verifyCustomerPin(pin)) {
-                System.out.println("Login successful.");
-                return;
-            }
-
-            attemptsRemaining--;
-            System.out.println("Incorrect PIN. Attempts remaining: " + attemptsRemaining);
-        }
-
-        System.out.println("Too many incorrect attempts. Exiting app.");
-        System.exit(0);
     }
 
     public void run() {
