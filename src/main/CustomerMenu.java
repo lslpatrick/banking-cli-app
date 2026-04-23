@@ -22,7 +22,30 @@ public class CustomerMenu {
         return selection;
     }
 
+    private boolean verifyCustomerPin() {
+        int attemptsRemaining = 3;
+
+        while (attemptsRemaining > 0) {
+            System.out.print("Enter customer PIN: ");
+            String pin = keyboardInput.next();
+
+            if (bank.verifyCustomerPin(pin)) {
+                return true;
+            }
+
+            attemptsRemaining--;
+            System.out.println("Incorrect PIN. Attempts remaining: " + attemptsRemaining);
+        }
+
+        System.out.println("Too many incorrect attempts. Access denied.");
+        return false;
+    }
+
     public void performDeposit() {
+        if (!verifyCustomerPin()) {
+            return;
+        }
+
         double depositAmount = -1;
         while (depositAmount < 0) {
             System.out.print("How much would you like to deposit: ");
@@ -39,6 +62,10 @@ public class CustomerMenu {
     }
 
     public void performWithdraw() {
+        if (!verifyCustomerPin()) {
+            return;
+        }
+
         double withdrawAmount = -1;
         while (withdrawAmount < 0) {
             System.out.print("How much would you like to withdraw: ");
@@ -58,6 +85,10 @@ public class CustomerMenu {
     }
 
     public void viewTransactionHistory() {
+        if (!verifyCustomerPin()) {
+            return;
+        }
+
         if (bank.getCurrentAccount().getTransactionHistory().isEmpty()) {
             System.out.println("No transactions history found.");
         } else {
@@ -69,10 +100,18 @@ public class CustomerMenu {
     }
 
     public void checkBalance() {
+        if (!verifyCustomerPin()) {
+            return;
+        }
+
         System.out.println("Current balance: " + bank.getCurrentAccount().getBalance());
     }
 
     public void createAccount() {
+        if (!verifyCustomerPin()) {
+            return;
+        }
+
         System.out.println("Select account type:");
         System.out.println("1. Saving");
         System.out.println("2. Checking");
@@ -94,6 +133,10 @@ public class CustomerMenu {
     }
 
     public void changeCurrentAccount() {
+        if (!verifyCustomerPin()) {
+            return;
+        }
+
         List<BankAccount> accounts = bank.getAccounts();
         System.out.println("Available accounts:");
         for (int i = 0; i < accounts.size(); i++) {
@@ -112,6 +155,10 @@ public class CustomerMenu {
     }
 
     public void closeCurrentAccount() {
+        if (!verifyCustomerPin()) {
+            return;
+        }
+
         try {
             String closedAccountName = bank.closeCurrentAccount();
             System.out.println("Account closed: " + closedAccountName);
@@ -122,6 +169,10 @@ public class CustomerMenu {
     }
 
     public void transferMoney() {
+        if (!verifyCustomerPin()) {
+            return;
+        }
+
         if (bank.getAccounts().size() == 1) {
             System.out.println("You need at least two accounts to make a transfer.");
             return;
@@ -150,6 +201,10 @@ public class CustomerMenu {
     }
 
     public void generateBankStatement() {
+        if (!verifyCustomerPin()) {
+            return;
+        }
+
         System.out.print("Enter statement file name: ");
         String fileName = keyboardInput.next();
 

@@ -90,9 +90,10 @@ public class AdminMenu {
             System.out.println("=== Admin Menu ===");
             System.out.println("1. View All Accounts");
             System.out.println("2. Change Admin Password");
-            System.out.println("3. Exit Admin Mode");
+            System.out.println("3. Update Savings Interest Rate");
+            System.out.println("4. Exit Admin Mode");
 
-            int selection = getUserSelection(3);
+            int selection = getUserSelection(4);
 
             switch (selection) {
                 case 1:
@@ -102,6 +103,9 @@ public class AdminMenu {
                     changeAdminPassword();
                     break;
                 case 3:
+                    updateSavingsInterestRate();
+                    break;
+                case 4:
                     adminMode = false;
                     System.out.println("Admin mode is now OFF");
                     break;
@@ -160,7 +164,7 @@ public class AdminMenu {
             System.out.println("3. Collect Fee");
             System.out.println("4. Add Interest");
             if (account.getAccountType().equals("Saving")) {
-                System.out.println("5. Add interest to saving account (2%)");
+                System.out.println("5. Add interest to saving account (" + (bank.getSavingsInterestRate() * 100) + "%)");
                 System.out.println("6. Back to Account List");
             } else {
                 System.out.println("5. Back to Account List");
@@ -220,6 +224,18 @@ public class AdminMenu {
             }
 
             account = bank.getAccounts().get(accountIndex);
+        }
+    }
+
+    public void updateSavingsInterestRate() {
+        System.out.print("Enter new savings interest rate: ");
+        double newSavingsInterestRate = keyboardInput.nextDouble();
+
+        try {
+            bank.updateSavingsInterestRate(newSavingsInterestRate);
+            System.out.println("Savings interest rate updated successfully.");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 }
