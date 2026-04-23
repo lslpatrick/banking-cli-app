@@ -159,9 +159,18 @@ public class AdminMenu {
             System.out.println("2. Unfreeze Account");
             System.out.println("3. Collect Fee");
             System.out.println("4. Add Interest");
-            System.out.println("5. Back to Account List");
+            if (account.getAccountType().equals("Saving")) {
+                System.out.println("5. Add interest to saving account (2%)");
+                System.out.println("6. Back to Account List");
+            } else {
+                System.out.println("5. Back to Account List");
+            }
 
-            int selection = getUserSelection(5);
+            int maxSelection = 5;
+            if (account.getAccountType().equals("Saving")) {
+                maxSelection = 6;
+            }
+            int selection = getUserSelection(maxSelection);
 
             switch (selection) {
                 case 1:
@@ -193,6 +202,17 @@ public class AdminMenu {
                     }
                     break;
                 case 5:
+                    if (account.getAccountType().equals("Saving")) {
+                        try {
+                            bank.addInterestToSavingAccount(accountIndex);
+                            System.out.println("Saving account interest added successfully.");
+                        } catch (IllegalArgumentException e) {
+                            System.out.println(e.getMessage());
+                        }
+                        break;
+                    }
+                    return;
+                case 6:
                     return;
                 default:
                     System.out.println("Invalid selection.");

@@ -20,7 +20,7 @@ public class MainMenu {
 
     public void displayOptions() {
         System.out.println();
-        System.out.println("Welcome to the 237 Bank App!");
+        System.out.println("==== Welcome to the 237 Bank App ====");
         System.out.println("Current account: " + bank.getCurrentAccount().getAccountName() + " (" + bank.getCurrentAccount().getAccountType() + ")");
         System.out.println("Admin mode: " + (adminMenu.isAdminMode() ? "ON" : "OFF"));
         System.out.println();

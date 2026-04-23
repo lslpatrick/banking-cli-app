@@ -96,6 +96,23 @@ public class BankTest {
     }
 
     @Test
+    public void testTransferCannotUseOverdrawProtection() {
+        Bank bank = new Bank();
+        bank.createAccount("nailong", "Checking");
+        bank.getCurrentAccount().deposit(20);
+
+        try {
+            bank.transferBetweenAccounts(1, 30);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertEquals(20, bank.getCurrentAccount().getBalance(), 0.01);
+        assertEquals(0, bank.getAccounts().get(1).getBalance(), 0.01);
+    }
+
+    @Test
     public void testCollectFeeFromExistingAccount() {
         Bank bank = new Bank();
         bank.getCurrentAccount().deposit(100);
@@ -118,6 +135,36 @@ public class BankTest {
         assertEquals(2, bank.getCurrentAccount().getTransactionHistory().size());
         assertEquals("Interest payment: $5.0",
                 bank.getCurrentAccount().getTransactionHistory().get(1));
+    }
+
+    @Test
+    public void testAddInterestToSavingAccount() {
+        Bank bank = new Bank();
+        bank.createAccount("nailong", "Saving");
+        bank.setCurrentAccountIndex(1);
+        bank.getCurrentAccount().deposit(100);
+
+        bank.addInterestToSavingAccount(1);
+
+        assertEquals(102, bank.getCurrentAccount().getBalance(), 0.01);
+        assertEquals(2, bank.getCurrentAccount().getTransactionHistory().size());
+        assertEquals("Interest payment: $2.0",
+                bank.getCurrentAccount().getTransactionHistory().get(1));
+    }
+
+    @Test
+    public void testCannotAddSavingInterestToCheckingAccount() {
+        Bank bank = new Bank();
+        bank.getCurrentAccount().deposit(100);
+
+        try {
+            bank.addInterestToSavingAccount(0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertEquals(100, bank.getCurrentAccount().getBalance(), 0.01);
     }
 
     @Test
@@ -183,6 +230,21 @@ public class BankTest {
         } catch (IllegalArgumentException e) {
             // test passes
         }
+    }
+
+    @Test
+    public void testCollectFeeCannotUseOverdrawProtection() {
+        Bank bank = new Bank();
+        bank.getCurrentAccount().withdrawWithOverdrawProtection(50);
+
+        try {
+            bank.collectFeeFromAccount(0, 10);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertEquals(-50, bank.getCurrentAccount().getBalance(), 0.01);
     }
 
     @Test
