@@ -6,20 +6,20 @@ import java.util.ArrayList;
 public class BankAccount {
     private static final double OVERDRAW_LIMIT = 200;
     private String accountName;
-    private String accountType;
+    private AccountType accountType;
     private double balance;
     private List<String> transactionHistory;
     private boolean frozen;
     
     public BankAccount() {
         this.accountName = "Default";
-        this.accountType = "Checking";
+        this.accountType = AccountType.CHECKING;
         this.balance = 0;
         this.transactionHistory = new ArrayList<>();
         this.frozen = false;
     }
 
-    public BankAccount(String accountName, String accountType) {
+    public BankAccount(String accountName, AccountType accountType) {
         this.accountName = accountName;
         this.accountType = accountType;
         this.balance = 0;
@@ -31,7 +31,7 @@ public class BankAccount {
         return this.accountName;
     }
 
-    public String getAccountType() {
+    public AccountType getAccountType() {
         return this.accountType;
     }
 
@@ -84,7 +84,7 @@ public class BankAccount {
         if (this.balance - amount < -OVERDRAW_LIMIT) {
             throw new IllegalArgumentException("Withdrawal exceeds overdraw limit.");
         }
-        if (!"Checking".equals(this.accountType)) {
+        if (this.accountType != AccountType.CHECKING) {
             throw new IllegalArgumentException("Only checking accounts can overdraw.");
         }
         this.balance -= amount;

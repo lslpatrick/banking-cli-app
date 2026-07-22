@@ -17,7 +17,7 @@ public class Bank {
         this.currentAccountIndex = 0;
         this.customerPin = null;
         this.savingsInterestRate = 0.02;
-        this.accounts.add(new BankAccount("Default", "Checking"));
+        this.accounts.add(new BankAccount("Default", AccountType.CHECKING));
     }
 
     public List<BankAccount> getAccounts() {
@@ -91,7 +91,11 @@ public class Bank {
         currentAccountIndex = newAccountIndex;
     }
 
-    public void createAccount(String accountName, String accountType) {
+    public void createAccount(String accountName, AccountType accountType) {
+        if (accountName == null || accountName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Account name cannot be empty.");
+        }
+
         accounts.add(new BankAccount(accountName, accountType));
     }
 
@@ -145,7 +149,7 @@ public class Bank {
 
     public void addInterestToSavingAccount(int accountIndex) {
         checkIndexAvailability(accountIndex);
-        if (!accounts.get(accountIndex).getAccountType().equals("Saving")) {
+        if (accounts.get(accountIndex).getAccountType() != AccountType.SAVING) {
             throw new IllegalArgumentException("Only saving accounts can use this interest option.");
         }
 

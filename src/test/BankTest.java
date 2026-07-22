@@ -1,5 +1,6 @@
 package test;
 
+import main.AccountType;
 import main.Bank;
 import main.BankAccount;
 
@@ -37,7 +38,7 @@ public class BankTest {
     @Test
     public void testCloseAccountSuccessful() {
         Bank bank = new Bank();
-        bank.createAccount("nailong", "Checking");
+        bank.createAccount("nailong", AccountType.CHECKING);
         bank.setCurrentAccountIndex(1);
 
         bank.closeCurrentAccount();
@@ -49,7 +50,7 @@ public class BankTest {
     @Test
     public void testCannotCloseAccountWithRemainingBalance() {
         Bank bank = new Bank();
-        bank.createAccount("nailong", "Checking");
+        bank.createAccount("nailong", AccountType.CHECKING);
         bank.setCurrentAccountIndex(1);
         bank.getCurrentAccount().deposit(50);
 
@@ -67,7 +68,7 @@ public class BankTest {
     @Test
     public void testTransferBetweenAccounts() {
         Bank bank = new Bank();
-        bank.createAccount("nailong", "Checking");
+        bank.createAccount("nailong", AccountType.CHECKING);
         bank.getCurrentAccount().deposit(100);
 
         bank.transferBetweenAccounts(1, 40);
@@ -105,7 +106,7 @@ public class BankTest {
     @Test
     public void testTransferCannotUseOverdrawProtection() {
         Bank bank = new Bank();
-        bank.createAccount("nailong", "Checking");
+        bank.createAccount("nailong", AccountType.CHECKING);
         bank.getCurrentAccount().deposit(20);
 
         try {
@@ -147,7 +148,7 @@ public class BankTest {
     @Test
     public void testAddInterestToSavingAccount() {
         Bank bank = new Bank();
-        bank.createAccount("nailong", "Saving");
+        bank.createAccount("nailong", AccountType.SAVING);
         bank.setCurrentAccountIndex(1);
         bank.getCurrentAccount().deposit(100);
 
@@ -177,17 +178,31 @@ public class BankTest {
     @Test
     public void testCreateAccount() {
         Bank bank = new Bank();
-        bank.createAccount("nailong", "Saving");
+        bank.createAccount("nailong", AccountType.SAVING);
 
         assertEquals(2, bank.getAccounts().size());
         assertEquals("nailong", bank.getAccounts().get(1).getAccountName());
-        assertEquals("Saving", bank.getAccounts().get(1).getAccountType());
+        assertEquals(AccountType.SAVING, bank.getAccounts().get(1).getAccountType());
+    }
+
+    @Test
+    public void testCreateAccountRejectsEmptyName() {
+        Bank bank = new Bank();
+
+        try {
+            bank.createAccount("   ", AccountType.SAVING);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+
+        assertEquals(1, bank.getAccounts().size());
     }
 
     @Test
     public void testFreezeAccountFromBank() {
         Bank bank = new Bank();
-        bank.createAccount("nailong", "Checking");
+        bank.createAccount("nailong", AccountType.CHECKING);
 
         bank.freezeAccount(1);
 
@@ -197,7 +212,7 @@ public class BankTest {
     @Test
     public void testUnfreezeAccountFromBank() {
         Bank bank = new Bank();
-        bank.createAccount("nailong", "Checking");
+        bank.createAccount("nailong", AccountType.CHECKING);
         bank.freezeAccount(1);
 
         bank.unfreezeAccount(1);
@@ -208,7 +223,7 @@ public class BankTest {
     @Test
     public void testChangeCurrentAccount() {
         Bank bank = new Bank();
-        bank.createAccount("nailong", "Saving");
+        bank.createAccount("nailong", AccountType.SAVING);
 
         bank.changeCurrentAccount(1);
 
@@ -330,6 +345,18 @@ public class BankTest {
     }
 
     @Test
+    public void testGenerateBankStatementRejectsEmptyFileName() throws Exception {
+        Bank bank = new Bank();
+
+        try {
+            bank.generateBankStatement(0, "   ");
+            fail();
+        } catch (IllegalArgumentException e) {
+            // test passes
+        }
+    }
+
+    @Test
     public void testUpdateSavingsInterestRate() {
         Bank bank = new Bank();
 
@@ -341,7 +368,7 @@ public class BankTest {
     @Test
     public void testUpdatedSavingsInterestRateChangesInterestPayment() {
         Bank bank = new Bank();
-        bank.createAccount("nailong", "Saving");
+        bank.createAccount("nailong", AccountType.SAVING);
         bank.setCurrentAccountIndex(1);
         bank.getCurrentAccount().deposit(100);
 

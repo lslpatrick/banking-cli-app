@@ -1,43 +1,30 @@
-# project26
+# Banking CLI App
 
-## Team Members:
+**Banking CLI App is a Java command-line banking simulator that demonstrates object-oriented software design, modular CLI architecture, business-rule modeling, and automated testing. Originally developed as a university project, it has since been refactored into a stronger portfolio application.**
 
-* Patrick Liu
-* William Hong
-* Tommy Liu
+## Highlights
 
-## User stories
+- Designed a modular object-oriented banking system using domain-driven classes and reusable menu workflows
+- Refactored account modeling with Java `enum` types to improve type safety and maintainability
+- Centralized CLI validation through reusable input utilities to improve robustness against invalid user input
+- Implemented banking business rules including overdraft protection, account freezing, administrator controls, and savings interest
+- Added automated JUnit 5 test coverage for banking logic, customer authentication, and CLI interaction flows
 
-1. A bank customer should be able to deposit into an existing account. (Shook)
-2. A bank customer should be able to withdraw from an account. (Patrick)
-3. A bank customer should be able to check their account balance. (Patrick)
-4. A bank customer should be able to view their transaction history for an account. (William)
-5. A bank customer should be able to create an additional account with the bank. (William)
-6. A bank customer should be able to close an existing account. (Tommy)
-7. A bank customer should be able to transfer money from one account to another. (Tommy)
-8. A bank adminstrator should be able to collect fees from existing accounts when necessary. (Tommy)
-9. A bank adminstrator should be able to add an interest payment to an existing account when necessary. (Tommy)
-10. A bank customer should be able to create a savings account. (William)
-11. A bank administrator should be able to freeze an account. (William)
-12. A bank administrator should be able to enter a password to enter the administrator system. (Patrick)
-13. A bank administrator should be able to change the password of entering the admin system.(Patrick)
-14. A bank customer should be able to set a PIN for accessing the bank app. (Tommy)
-15. A bank customer should be able to log in with a PIN before using account services. (Tommy)
-16. A checking account customer should be able to withdraw money using overdraft protection. (William)
-17. A savings account customer should be able to earn interest based on a savings interest rate. (William)
-18. A bank customer should be able to generate a bank statement for an account. (Patrick)
-19. A bank administrator should be able to update the interest rate for savings accounts. (Patrick)
+### Customer
 
+- PIN setup and authentication
+- Checking and savings accounts
+- Deposits and withdrawals
+- Balance inquiry
+- Transaction history
+- Account switching
+- Inter-account transfers
+- Bank statement generation
 
-## What user stories were completed this iteration?
-14 to 19
+### Administrator
 
-## What user stories do you intend to complete next iteration?
-N/A
-
-## Is there anything that you implemented but doesn't currently work?
-N/A
-
-## What commands are needed to compile and run your code from the command line (you should provide a script that people can use to run your program)
-chmod +x runApp.sh  
-./runApp.sh
+- Password-protected admin mode
+- Freeze and unfreeze accounts
+- Collect maintenance fees
+- Configure savings interest rate
+- Apply savings interest

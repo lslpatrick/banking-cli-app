@@ -5,29 +5,27 @@ import java.util.List;
 import java.util.Scanner;
 
 public class CustomerMenu {
-    private Scanner keyboardInput;
-    private Bank bank;
+    private final InputHelper inputHelper;
+    private final Bank bank;
 
-    public CustomerMenu(Scanner keyboardInput, Bank bank) {
-        this.keyboardInput = keyboardInput;
+    public CustomerMenu(InputHelper inputHelper, Bank bank) {
+        this.inputHelper = inputHelper;
         this.bank = bank;
     }
 
+    public CustomerMenu(Scanner keyboardInput, Bank bank) {
+        this(new InputHelper(keyboardInput), bank);
+    }
+
     public int getUserSelection(int max) {
-        int selection = -1;
-        while (selection < 1 || selection > max) {
-            System.out.print("Please make a selection: ");
-            selection = keyboardInput.nextInt();
-        }
-        return selection;
+        return inputHelper.readIntInRange("Please make a selection: ", 1, max);
     }
 
     private boolean verifyCustomerPin() {
         int attemptsRemaining = 3;
 
         while (attemptsRemaining > 0) {
-            System.out.print("Enter customer PIN: ");
-            String pin = keyboardInput.next();
+            String pin = inputHelper.readLine("Enter customer PIN: ");
 
             if (bank.verifyCustomerPin(pin)) {
                 return true;
@@ -46,11 +44,7 @@ public class CustomerMenu {
             return;
         }
 
-        double depositAmount = -1;
-        while (depositAmount < 0) {
-            System.out.print("How much would you like to deposit: ");
-            depositAmount = keyboardInput.nextDouble();
-        }
+        double depositAmount = inputHelper.readPositiveDouble("How much would you like to deposit: ");
 
         try {
             bank.getCurrentAccount().deposit(depositAmount);
@@ -66,11 +60,7 @@ public class CustomerMenu {
             return;
         }
 
-        double withdrawAmount = -1;
-        while (withdrawAmount < 0) {
-            System.out.print("How much would you like to withdraw: ");
-            withdrawAmount = keyboardInput.nextDouble();
-        }
+        double withdrawAmount = inputHelper.readPositiveDouble("How much would you like to withdraw: ");
 
         try {
             boolean usedOverdrawProtection = bank.getCurrentAccount().withdrawWithOverdrawProtection(withdrawAmount);
@@ -118,15 +108,16 @@ public class CustomerMenu {
 
         int typeSelection = getUserSelection(2);
 
-        String accountType;
+        AccountType accountType;
         if (typeSelection == 1) {
-            accountType = "Saving";
+            accountType = AccountType.SAVING;
         } else {
-            accountType = "Checking";
+            accountType = AccountType.CHECKING;
         }
 
-        System.out.print("Enter account name: ");
-        String accountName = keyboardInput.next();
+        String accountName = inputHelper.readRequiredLine(
+                "Enter account name: ",
+                "Account name cannot be empty.");
 
         bank.createAccount(accountName, accountType);
         System.out.println("New " + accountType + " account created.");
@@ -143,8 +134,7 @@ public class CustomerMenu {
             System.out.println((i + 1) + ". " + accounts.get(i).getAccountName() + " (" + accounts.get(i).getAccountType() + ")");
         }
 
-        System.out.print("Enter account number: ");
-        int newAccountNumber = keyboardInput.nextInt();
+        int newAccountNumber = inputHelper.readIntInRange("Enter account number: ", 1, accounts.size());
 
         try {
             bank.changeCurrentAccount(newAccountNumber - 1);
@@ -178,19 +168,17 @@ public class CustomerMenu {
             return;
         }
 
-        double transferAmount = -1;
-        while (transferAmount <= 0) {
-            System.out.print("How much would you like to transfer: ");
-            transferAmount = keyboardInput.nextDouble();
-        }
+        double transferAmount = inputHelper.readPositiveDouble("How much would you like to transfer: ");
 
         System.out.println("Available accounts:");
         for (int i = 0; i < bank.getAccounts().size(); i++) {
             System.out.println((i + 1) + ". " + bank.getAccounts().get(i).getAccountName());
         }
 
-        System.out.print("Enter target account number: ");
-        int targetAccountNumber = keyboardInput.nextInt();
+        int targetAccountNumber = inputHelper.readIntInRange(
+                "Enter target account number: ",
+                1,
+                bank.getAccounts().size());
 
         try {
             bank.transferBetweenAccounts(targetAccountNumber - 1, transferAmount);
@@ -205,8 +193,9 @@ public class CustomerMenu {
             return;
         }
 
-        System.out.print("Enter statement file name: ");
-        String fileName = keyboardInput.next();
+        String fileName = inputHelper.readRequiredLine(
+                "Enter statement file name: ",
+                "Statement file name cannot be empty.");
 
         if (!fileName.endsWith(".txt")) {
             fileName += ".txt";

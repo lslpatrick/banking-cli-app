@@ -6,24 +6,23 @@ import java.util.Scanner;
 public class AdminMenu {
     private String ADMIN_PASSWORD;
 
-    private Scanner keyboardInput;
-    private Bank bank;
+    private final InputHelper inputHelper;
+    private final Bank bank;
     private boolean adminMode;
 
-    public AdminMenu(Scanner keyboardInput, Bank bank) {
-        this.keyboardInput = keyboardInput;
+    public AdminMenu(InputHelper inputHelper, Bank bank) {
+        this.inputHelper = inputHelper;
         this.bank = bank;
         this.adminMode = false;
         this.ADMIN_PASSWORD = "0422";
     }
 
+    public AdminMenu(Scanner keyboardInput, Bank bank) {
+        this(new InputHelper(keyboardInput), bank);
+    }
+
     public int getUserSelection(int max) {
-        int selection = -1;
-        while (selection < 1 || selection > max) {
-            System.out.print("Please make a selection: ");
-            selection = keyboardInput.nextInt();
-        }
-        return selection;
+        return inputHelper.readIntInRange("Please make a selection: ", 1, max);
     }
 
     public boolean isAdminMode() {
@@ -48,13 +47,8 @@ public class AdminMenu {
     }
 
     public void changeAdminPassword() {
-        keyboardInput.nextLine();
-
-        System.out.print("Enter current administrator password: ");
-        String currentPassword = keyboardInput.nextLine();
-
-        System.out.print("Enter new administrator password: ");
-        String newPassword = keyboardInput.nextLine();
+        String currentPassword = inputHelper.readLine("Enter current administrator password: ");
+        String newPassword = inputHelper.readLine("Enter new administrator password: ");
 
         if (updateAdminPassword(currentPassword, newPassword)) {
             System.out.println("Administrator password changed successfully.");
@@ -71,9 +65,7 @@ public class AdminMenu {
         }
 
         System.out.println("Default admin password is 0422. Please change it in the code for better security.");
-        System.out.print("Enter administrator password: ");
-        keyboardInput.nextLine();
-        String password = keyboardInput.nextLine();
+        String password = inputHelper.readLine("Enter administrator password: ");
 
         if (isCorrectAdminPassword(password)) {
             adminMode = true;
@@ -132,9 +124,7 @@ public class AdminMenu {
             }
 
             System.out.println((accounts.size() + 1) + ". Exit Account List");
-            System.out.print("Enter selection: ");
-
-            int selection = keyboardInput.nextInt();
+            int selection = inputHelper.readIntInRange("Enter selection: ", 1, accounts.size() + 1);
 
             if (selection == accounts.size() + 1) {
                 return;
@@ -163,7 +153,7 @@ public class AdminMenu {
             System.out.println("2. Unfreeze Account");
             System.out.println("3. Collect Fee");
             System.out.println("4. Add Interest");
-            if (account.getAccountType().equals("Saving")) {
+            if (account.getAccountType() == AccountType.SAVING) {
                 System.out.println("5. Add interest to saving account (" + (bank.getSavingsInterestRate() * 100) + "%)");
                 System.out.println("6. Back to Account List");
             } else {
@@ -171,7 +161,7 @@ public class AdminMenu {
             }
 
             int maxSelection = 5;
-            if (account.getAccountType().equals("Saving")) {
+            if (account.getAccountType() == AccountType.SAVING) {
                 maxSelection = 6;
             }
             int selection = getUserSelection(maxSelection);
@@ -186,8 +176,7 @@ public class AdminMenu {
                     System.out.println("Account unfrozen successfully.");
                     break;
                 case 3:
-                    System.out.print("Enter fee amount: ");
-                    double feeAmount = keyboardInput.nextDouble();
+                    double feeAmount = inputHelper.readPositiveDouble("Enter fee amount: ");
                     try {
                         bank.collectFeeFromAccount(accountIndex, feeAmount);
                         System.out.println("Fee collected successfully.");
@@ -196,8 +185,7 @@ public class AdminMenu {
                     }
                     break;
                 case 4:
-                    System.out.print("Enter interest amount: ");
-                    double interestAmount = keyboardInput.nextDouble();
+                    double interestAmount = inputHelper.readPositiveDouble("Enter interest amount: ");
                     try {
                         bank.addInterestToAccount(accountIndex, interestAmount);
                         System.out.println("Interest payment added successfully.");
@@ -206,7 +194,7 @@ public class AdminMenu {
                     }
                     break;
                 case 5:
-                    if (account.getAccountType().equals("Saving")) {
+                    if (account.getAccountType() == AccountType.SAVING) {
                         try {
                             bank.addInterestToSavingAccount(accountIndex);
                             System.out.println("Saving account interest added successfully.");
@@ -228,8 +216,7 @@ public class AdminMenu {
     }
 
     public void updateSavingsInterestRate() {
-        System.out.print("Enter new savings interest rate: ");
-        double newSavingsInterestRate = keyboardInput.nextDouble();
+        double newSavingsInterestRate = inputHelper.readPositiveDouble("Enter new savings interest rate: ");
 
         try {
             bank.updateSavingsInterestRate(newSavingsInterestRate);

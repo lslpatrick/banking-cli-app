@@ -7,6 +7,7 @@ import java.util.Scanner;
 import main.AdminMenu;
 import main.Bank;
 import main.CustomerMenu;
+import main.InputHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -78,5 +79,35 @@ public class MainMenuTest {
         menu.performDeposit();
 
         assertEquals(0, bank.getCurrentAccount().getBalance(), 0.01);
+    }
+
+    @Test
+    public void testInputHelperRetriesAfterInvalidMenuSelection() {
+        InputHelper inputHelper = new InputHelper(
+                new Scanner(new ByteArrayInputStream("abc\n12\n2\n".getBytes())));
+
+        int selection = inputHelper.readIntInRange("Please make a selection: ", 1, 3);
+
+        assertEquals(2, selection);
+    }
+
+    @Test
+    public void testInputHelperRetriesAfterInvalidAmount() {
+        InputHelper inputHelper = new InputHelper(
+                new Scanner(new ByteArrayInputStream("nope\n-5\n10.5\n".getBytes())));
+
+        double amount = inputHelper.readPositiveDouble("Enter amount: ");
+
+        assertEquals(10.5, amount, 0.01);
+    }
+
+    @Test
+    public void testInputHelperRetriesAfterEmptyRequiredText() {
+        InputHelper inputHelper = new InputHelper(
+                new Scanner(new ByteArrayInputStream("\n   \nSavings\n".getBytes())));
+
+        String value = inputHelper.readRequiredLine("Enter account name: ", "Account name cannot be empty.");
+
+        assertEquals("Savings", value);
     }
 }

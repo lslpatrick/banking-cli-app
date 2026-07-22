@@ -4,18 +4,19 @@ import java.util.Scanner;
 
 public class MainMenu {
     private static final int EXIT_SELECTION = 11;
-    private static final int MAX_SELECTION = 10086;
 
-    private Scanner keyboardInput;
-    private Bank bank;
-    private CustomerMenu customerMenu;
-    private AdminMenu adminMenu;
+    private final Scanner keyboardInput;
+    private final InputHelper inputHelper;
+    private final Bank bank;
+    private final CustomerMenu customerMenu;
+    private final AdminMenu adminMenu;
 
     public MainMenu() {
         this.keyboardInput = new Scanner(System.in);
+        this.inputHelper = new InputHelper(keyboardInput);
         this.bank = new Bank();
-        this.customerMenu = new CustomerMenu(keyboardInput, bank);
-        this.adminMenu = new AdminMenu(keyboardInput, bank);
+        this.customerMenu = new CustomerMenu(inputHelper, bank);
+        this.adminMenu = new AdminMenu(inputHelper, bank);
     }
 
     public void displayOptions() {
@@ -38,12 +39,7 @@ public class MainMenu {
     }
 
     public int getUserSelection(int max) {
-        int selection = -1;
-        while (selection < 1 || selection > max) {
-            System.out.print("Please make a selection: ");
-            selection = keyboardInput.nextInt();
-        }
-        return selection;
+        return inputHelper.readIntInRange("Please make a selection: ", 1, max);
     }
 
     public void processInput(int selection) {
@@ -93,11 +89,9 @@ public class MainMenu {
             System.out.println("Please create a 4-digit PIN before using account services.");
 
             while (true) {
-                System.out.print("Enter new PIN: ");
-                String pin = keyboardInput.nextLine();
+                String pin = inputHelper.readLine("Enter new PIN: ");
 
-                System.out.print("Confirm new PIN: ");
-                String confirmPin = keyboardInput.nextLine();
+                String confirmPin = inputHelper.readLine("Confirm new PIN: ");
 
                 if (!pin.equals(confirmPin)) {
                     System.out.println("PINs do not match. Please try again.");
@@ -122,7 +116,7 @@ public class MainMenu {
         int selection = -1;
         while (selection != EXIT_SELECTION) {
             displayOptions();
-            selection = getUserSelection(MAX_SELECTION);
+            selection = getUserSelection(EXIT_SELECTION);
             processInput(selection);
         }
     }

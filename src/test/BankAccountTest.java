@@ -1,5 +1,6 @@
 package test;
 
+import main.AccountType;
 import main.BankAccount;
 
 import static org.junit.Assert.assertEquals;
@@ -62,7 +63,7 @@ public class BankAccountTest {
 
     @Test
     public void testWithdrawWithOverdrawProtection() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         testAccount.deposit(20);
         boolean usedOverdrawProtection = testAccount.withdrawWithOverdrawProtection(70);
 
@@ -72,7 +73,7 @@ public class BankAccountTest {
 
     @Test
     public void testWithdrawWithOverdrawProtectionLimit() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         boolean usedOverdrawProtection = testAccount.withdrawWithOverdrawProtection(200);
 
         assertTrue(usedOverdrawProtection);
@@ -81,7 +82,7 @@ public class BankAccountTest {
 
     @Test
     public void testCannotWithdrawPastOverdrawProtectionLimit() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         try {
             testAccount.withdrawWithOverdrawProtection(201);
             fail();
@@ -94,7 +95,7 @@ public class BankAccountTest {
 
     @Test
     public void testSavingCannotUseOverdrawProtection() {
-        BankAccount testAccount = new BankAccount("nailong", "Saving");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.SAVING);
         testAccount.deposit(20);
         try {
             testAccount.withdrawWithOverdrawProtection(30);
@@ -108,7 +109,7 @@ public class BankAccountTest {
 
     @Test
     public void testWithdrawDoesNotUseOverdrawProtection() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         testAccount.deposit(20);
         try {
             testAccount.withdraw(30);
@@ -158,33 +159,33 @@ public class BankAccountTest {
 
     @Test
     public void testCustomAccountName() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         assertEquals("nailong", testAccount.getAccountName());
     }
 
     @Test
     public void testNewAccountBalanceIsZero() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         assertEquals(0, testAccount.getBalance(), 0.01);
     }
 
     @Test
     public void testNewAccountTransactionHistoryIsEmpty() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         assertEquals(0, testAccount.getTransactionHistory().size());
     }
 
     @Test
     public void testDepositWithCustomAccount() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         testAccount.deposit(200);
         assertEquals(200, testAccount.getBalance(), 0.01);
     }
 
     @Test
     public void testMultipleAccountsIndependence() {
-        BankAccount acc1 = new BankAccount("nailong", "Checking");
-        BankAccount acc2 = new BankAccount("nailong2", "Saving");
+        BankAccount acc1 = new BankAccount("nailong", AccountType.CHECKING);
+        BankAccount acc2 = new BankAccount("nailong2", AccountType.SAVING);
 
         acc1.deposit(100);
         acc2.deposit(50);
@@ -195,14 +196,14 @@ public class BankAccountTest {
 
     @Test
     public void testFreezeAccount() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         testAccount.freezeAccount();
         assertTrue(testAccount.isFrozen());
     }
 
     @Test
     public void testUnfreezeAccount() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         testAccount.freezeAccount();
         testAccount.unfreezeAccount();
         assertFalse(testAccount.isFrozen());
@@ -210,7 +211,7 @@ public class BankAccountTest {
 
     @Test
     public void testDepositWhenFrozen() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         testAccount.freezeAccount();
 
         try {
@@ -223,7 +224,7 @@ public class BankAccountTest {
 
     @Test
     public void testWithdrawWhenFrozen() {
-        BankAccount testAccount = new BankAccount("nailong", "Checking");
+        BankAccount testAccount = new BankAccount("nailong", AccountType.CHECKING);
         testAccount.deposit(100);
         testAccount.freezeAccount();
 
@@ -238,12 +239,12 @@ public class BankAccountTest {
     @Test
     public void testDefaultAccountType() {
         BankAccount testAccount = new BankAccount();
-        assertEquals("Checking", testAccount.getAccountType());
+        assertEquals(AccountType.CHECKING, testAccount.getAccountType());
     }
 
     @Test
     public void testCustomAccountType() {
-        BankAccount testAccount = new BankAccount("nailong", "Saving");
-        assertEquals("Saving", testAccount.getAccountType());
+        BankAccount testAccount = new BankAccount("nailong", AccountType.SAVING);
+        assertEquals(AccountType.SAVING, testAccount.getAccountType());
     }
 }
